@@ -1,5 +1,7 @@
 using Visitor.ServiceDefaults;
 using Visitor.Web.Common.Layout;
+using Visitor.Web.Features;
+using Visitor.Web.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,9 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.AddInfrastructure();
+builder.AddFeatures();
 
 var app = builder.Build();
 

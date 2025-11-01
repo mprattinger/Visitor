@@ -12,10 +12,11 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" />
+    <PackageReference Include="Aspire.Hosting.Docker" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Visitor.Web\Visitor.Web.csproj" />
+    <ProjectReference Include="..\..\Visitor.Web\Visitor.Web.csproj" />
   </ItemGroup>
 
 </Project>

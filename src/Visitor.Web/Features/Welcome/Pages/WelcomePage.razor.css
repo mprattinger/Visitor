@@ -1,0 +1,21 @@
+.selector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    gap: 2rem;
+}
+
+::deep .select-it {
+    width: 20%;
+    height: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #007FFF;
+    text-align: center;
+    font-size: larger;
+    color: white;
+    border-radius: 1rem;
+    cursor: pointer;
+}
