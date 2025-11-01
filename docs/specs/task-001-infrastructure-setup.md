@@ -7,10 +7,10 @@
 **Phase**: Infrastructure & Setup
 
 ## Description
-Set up the foundational .NET 10 Blazor Server project structure with all required dependencies and initial configuration for the Company Visitor Tracking System.
+Set up the foundational .NET 10 Blazor Server project structure using Domain-Driven Design (DDD) and Vertical Slice Architecture, with all required dependencies and initial configuration for the Company Visitor Tracking System.
 
 ## Acceptance Criteria
-- [ ] Create new .NET 10 Blazor Server project with proper folder structure
+- [ ] Create new .NET 10 Blazor Server project with folder structure supporting DDD, Vertical Slice Architecture, and CQRS (using FlintSoft.CQRS)
 - [ ] Configure project for SQLite database with Entity Framework Core
 - [ ] Set up development environment configuration files (appsettings.json, appsettings.Development.json)
 - [ ] Initialize Git repository with appropriate .gitignore for .NET projects
@@ -18,12 +18,16 @@ Set up the foundational .NET 10 Blazor Server project structure with all require
 - [ ] Set up basic logging infrastructure (Serilog or built-in logging)
 - [ ] Configure development HTTPS certificates
 - [ ] Verify project builds and runs successfully in development environment
-- [ ] Create basic project folder structure (Models, Services, Data, Components)
+- [ ] Create vertical slice feature folders (Features, Domain, Infrastructure, Shared, etc.)
+- [ ] Integrate CQRS pattern with FlintSoft.CQRS for request/response handling
 
 ## Technical Requirements
 - .NET 10 SDK
 - Entity Framework Core 8.0+ with SQLite provider
-- Basic Blazor Server template with Interactive Server components
+- Blazor Server template with Interactive Server components
+- Domain-Driven Design principles applied to solution structure
+- Vertical Slice Architecture for feature organization
+- CQRS pattern implemented using FlintSoft.CQRS (Mediator clone)
 - Development environment ready for Entra ID integration
 - Docker support files (Dockerfile, .dockerignore)
 - Logging framework configuration
@@ -43,20 +47,33 @@ dotnet add package Microsoft.EntityFrameworkCore.Design
 dotnet add package Microsoft.EntityFrameworkCore.Tools
 dotnet add package Serilog.AspNetCore
 dotnet add package Microsoft.AspNetCore.Authentication.OpenIdConnect
+# Add FlintSoft.CQRS for CQRS/Mediator pattern
+dotnet add package FlintSoft.CQRS --source https://nuget.pkg.github.com/mprattinger/index.json
 ```
 
 ### 3. Folder Structure
-Create the following directory structure:
+Create the following directory structure, reflecting DDD, Vertical Slice Architecture, and CQRS:
 ```
-/Data
+/Features
+  /VisitorRegistration
+  /VisitorStatusManagement
+  /EmployeePreregistration
+  /AdminDashboard
+    /Commands
+    /Queries
+    /Handlers
+/Domain
   /Entities
-  /Context
-  /Migrations
-/Models
-  /ViewModels
+  /ValueObjects
+  /Aggregates
+  /Events
+/Infrastructure
+  /Persistence
+  /Logging
+  /Authentication
+/Shared
   /DTOs
-/Services
-  /Interfaces
+  /ViewModels
 /Components
   /Pages
   /Shared
@@ -143,7 +160,7 @@ README.md
 ```
 
 ## Definition of Done
-- [ ] Project structure is established and documented
+- [ ] Project structure is established and documented, following DDD, Vertical Slice Architecture, and CQRS
 - [ ] All team members can clone and run the project locally
 - [ ] Basic Blazor pages render correctly (Home page accessible)
 - [ ] Database connection is configured (but not yet migrated)
@@ -151,12 +168,14 @@ README.md
 - [ ] Git repository is initialized with proper .gitignore
 - [ ] Project builds without errors or warnings
 - [ ] Development HTTPS certificate is configured and working
-- [ ] All folder structures are in place
+- [ ] All folder structures are in place, including vertical slice feature folders and CQRS structure
 - [ ] README.md with setup instructions is created
 
 ## Notes
 - This task establishes the foundation for all subsequent development
-- Focus on clean architecture and proper separation of concerns
+- Focus on clean architecture, Domain-Driven Design, CQRS, and proper separation of concerns
+- Organize features using Vertical Slice Architecture (each feature in its own folder with commands, queries, handlers, models, and UI components)
+- Use FlintSoft.CQRS for implementing the Mediator pattern and CQRS request/response handling
 - Ensure all team members have consistent development environment setup
 - Document any environment-specific setup requirements
 - Keep configuration files ready for Entra ID settings (to be added in TASK-003)
