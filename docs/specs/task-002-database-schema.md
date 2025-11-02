@@ -11,10 +11,8 @@ Design and implement the complete database schema using Entity Framework Core wi
 
 ## Acceptance Criteria
 - [ ] Design and implement `Visitor` entity with all required properties
-- [ ] Design and implement `User` entity for employee information
 - [ ] Create `VisitorStatus` enum (Planned, Arrived, Left)
-- [ ] Create `UserRole` enum (Employee, Admin)
-- [ ] Implement proper entity relationships and constraints
+- [ ] Implement proper entity relationships and constraints (user management is handled via Entra ID; no custom User entity)
 - [ ] Create initial EF Core migration
 - [ ] Set up database seeding for development data
 - [ ] Configure EF Core context with proper configurations
@@ -52,50 +50,15 @@ namespace VisitorTracking.Data.Entities
         
         public DateTime? LeftAt { get; set; }
         
-        public string? CreatedByUserId { get; set; }
-        
-        [Required]
-        [MaxLength(50)]
-        public string VisitorToken { get; set; } = string.Empty;
-        
-        // Navigation Properties
-        public User? CreatedByUser { get; set; }
+    // Optionally, you may store the Entra ID user identifier if needed for audit purposes:
+    public string? CreatedByEntraId { get; set; }
+    [Required]
+    [MaxLength(50)]
+    public string VisitorToken { get; set; } = string.Empty;
     }
 }
 ```
 
-### User Entity
-**File: `Data/Entities/User.cs`**
-```csharp
-using System.ComponentModel.DataAnnotations;
-
-namespace VisitorTracking.Data.Entities
-{
-    public class User
-    {
-        [Required]
-        [MaxLength(100)]
-        public string Id { get; set; } = string.Empty; // From Entra ID
-        
-        [Required]
-        [MaxLength(200)]
-        public string Email { get; set; } = string.Empty;
-        
-        [Required]
-        [MaxLength(100)]
-        public string DisplayName { get; set; } = string.Empty;
-        
-        public UserRole Role { get; set; } = UserRole.Employee;
-        
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        
-        public DateTime? LastLoginAt { get; set; }
-        
-        // Navigation Properties
-        public ICollection<Visitor> PreRegisteredVisitors { get; set; } = new List<Visitor>();
-    }
-}
-```
 
 ### Enums
 **File: `Data/Entities/VisitorStatus.cs`**
@@ -111,17 +74,6 @@ namespace VisitorTracking.Data.Entities
 }
 ```
 
-**File: `Data/Entities/UserRole.cs`**
-```csharp
-namespace VisitorTracking.Data.Entities
-{
-    public enum UserRole
-    {
-        Employee = 0,
-        Admin = 1
-    }
-}
-```
 
 ## Database Context Configuration
 
@@ -141,7 +93,6 @@ namespace VisitorTracking.Data.Context
         }
 
         public DbSet<Visitor> Visitors { get; set; }
-        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -161,22 +112,8 @@ namespace VisitorTracking.Data.Context
                 entity.HasIndex(e => e.CreatedAt);
                 entity.HasIndex(e => new { e.Name, e.Company, e.CreatedAt });
                 
-                entity.HasOne(e => e.CreatedByUser)
-                      .WithMany(u => u.PreRegisteredVisitors)
-                      .HasForeignKey(e => e.CreatedByUserId)
-                      .OnDelete(DeleteBehavior.SetNull);
             });
 
-            // User Configuration
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                
-                entity.Property(e => e.Email).IsRequired().HasMaxLength(200);
-                entity.Property(e => e.DisplayName).IsRequired().HasMaxLength(100);
-                
-                entity.HasIndex(e => e.Email).IsUnique();
-            });
         }
     }
 }
@@ -201,15 +138,12 @@ builder.Services.AddDbContext<VisitorTrackingContext>(options =>
 
 ### 1. Create Entity Classes
 - [ ] Create `Visitor` entity with all properties
-- [ ] Create `User` entity with all properties
 - [ ] Create `VisitorStatus` enum
-- [ ] Create `UserRole` enum
 
 ### 2. Configure Entity Framework
 - [ ] Implement `VisitorTrackingContext`
-- [ ] Configure entity relationships
+- [ ] Configure entity relationships (no custom User entity)
 - [ ] Set up database indexes
-- [ ] Configure cascade delete behaviors
 
 ### 3. Create Initial Migration
 ```bash
@@ -232,30 +166,6 @@ namespace VisitorTracking.Data.Context
     {
         public static async Task SeedAsync(VisitorTrackingContext context)
         {
-            // Seed test users (for development without Entra ID)
-            if (!context.Users.Any())
-            {
-                var admin = new User
-                {
-                    Id = "test-admin-001",
-                    Email = "admin@company.com",
-                    DisplayName = "Test Administrator",
-                    Role = UserRole.Admin,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                var employee = new User
-                {
-                    Id = "test-employee-001",
-                    Email = "employee@company.com",
-                    DisplayName = "Test Employee",
-                    Role = UserRole.Employee,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                context.Users.AddRange(admin, employee);
-                await context.SaveChangesAsync();
-            }
 
             // Seed test visitors
             if (!context.Visitors.Any())
@@ -369,11 +279,10 @@ public async Task Visitor_ShouldCreateWithValidData()
 ## Technical Notes
 - Use Fluent API for complex configurations
 - Ensure proper handling of UTC timestamps
-- Configure cascade delete behavior appropriately (SetNull for CreatedByUser)
 - Visitor tokens should be cryptographically secure and unique
 - Consider implementing soft delete for audit requirements in future phases
 
 ## Dependencies for Next Tasks
-- TASK-003 (Entra ID Authentication) requires User entity
+- TASK-003 (Entra ID Authentication) requires Entra ID integration
 - TASK-007 (Visitor Registration) requires Visitor entity
 - All data-related tasks depend on this database foundation
