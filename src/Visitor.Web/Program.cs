@@ -1,7 +1,9 @@
 
+using Microsoft.EntityFrameworkCore;
 using Visitor.Web.Common.Layout;
 using Visitor.Web.Features;
 using Visitor.Web.Infrastructure;
+using Visitor.Web.Infrastructure.Persistance;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,15 @@ builder.AddInfrastructure();
 builder.AddFeatures();
 
 var app = builder.Build();
+
+// Seed database in development
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<VisitorDbContext>();
+    await context.Database.MigrateAsync();
+    await DbSeeder.SeedAsync(context);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
