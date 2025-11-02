@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\aspire\Visitor.ServiceDefaults\Visitor.ServiceDefaults.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="FlintSoft.CQRS" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

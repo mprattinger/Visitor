@@ -1,11 +1,10 @@
-using Visitor.ServiceDefaults;
+
 using Visitor.Web.Common.Layout;
 using Visitor.Web.Features;
 using Visitor.Web.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -15,8 +14,6 @@ builder.AddInfrastructure();
 builder.AddFeatures();
 
 var app = builder.Build();
-
-app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

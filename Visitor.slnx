@@ -1,7 +1,3 @@
 <Solution>
-  <Folder Name="/aspire/">
-    <Project Path="src/aspire/Visitor.AppHost/Visitor.AppHost.csproj" Id="1d8baaf6-c4b2-416a-9f8d-703c921b7496" />
-    <Project Path="src/aspire/Visitor.ServiceDefaults/Visitor.ServiceDefaults.csproj" />
-  </Folder>
   <Project Path="src/Visitor.Web/Visitor.Web.csproj" />
 </Solution>
