@@ -21,13 +21,13 @@ Design and implement the complete database schema using Entity Framework Core wi
 ## Entity Specifications
 
 ### Visitor Entity
-**File: `Data/Entities/Visitor.cs`**
+**File: `Features/Visitor/DomainEntities/Visitor.cs`**
 ```csharp
 using System.ComponentModel.DataAnnotations;
 
 namespace VisitorTracking.Data.Entities
 {
-    public class Visitor
+    public class Visitor : AggregateRoot
     {
         public Guid Id { get; set; }
         
@@ -61,7 +61,7 @@ namespace VisitorTracking.Data.Entities
 
 
 ### Enums
-**File: `Data/Entities/VisitorStatus.cs`**
+**File: `Features/Visitor/DomainEntities/VisitorStatus.cs`**
 ```csharp
 namespace VisitorTracking.Data.Entities
 {
@@ -78,7 +78,7 @@ namespace VisitorTracking.Data.Entities
 ## Database Context Configuration
 
 ### DbContext Implementation
-**File: `Data/Context/VisitorTrackingContext.cs`**
+**File: `Infrastructure/Persistance/VisitorTrackingContext.cs`**
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using VisitorTracking.Data.Entities;
@@ -96,28 +96,16 @@ namespace VisitorTracking.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
             base.OnModelCreating(modelBuilder);
-
-            // Visitor Configuration
-            modelBuilder.Entity<Visitor>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                
-                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.Company).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.VisitorToken).IsRequired().HasMaxLength(50);
-                
-                entity.HasIndex(e => e.VisitorToken).IsUnique();
-                entity.HasIndex(e => e.Status);
-                entity.HasIndex(e => e.CreatedAt);
-                entity.HasIndex(e => new { e.Name, e.Company, e.CreatedAt });
-                
-            });
-
         }
     }
 }
 ```
+
+### Visitor configuration
+**FIle: `Infrastructure/Persistance/Configurations/VisitorConfiguration
 
 ### Program.cs Configuration
 Add to `Program.cs`:
