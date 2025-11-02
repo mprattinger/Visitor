@@ -4,6 +4,8 @@ namespace Visitor.Web.Infrastructure.Persistance;
 
 public static class DbSeeder
 {
+    private const int TokenLength = 16;
+
     public static async Task SeedAsync(VisitorDbContext context)
     {
         // Seed test visitors
@@ -41,6 +43,6 @@ public static class DbSeeder
 
     private static string GenerateToken()
     {
-        return Guid.NewGuid().ToString("N")[..16].ToUpper();
+        return Guid.NewGuid().ToString("N")[..TokenLength].ToUpper();
     }
 }

@@ -18,7 +18,7 @@ public class Visitor : AggregateRoot
     
     public VisitorStatus Status { get; set; } = VisitorStatus.Planned;
     
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; }
     
     public DateTime? ArrivedAt { get; set; }
     
