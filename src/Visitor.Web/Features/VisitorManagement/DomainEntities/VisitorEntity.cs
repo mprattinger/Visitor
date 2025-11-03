@@ -7,39 +7,35 @@ public class VisitorEntity : AggregateRoot
 {
     [Required]
     [MaxLength(100)]
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; private set; } = string.Empty;
 
     [Required]
     [MaxLength(100)]
-    public string Company { get; set; } = string.Empty;
+    public string Company { get; private set; } = string.Empty;
 
-    [Required]
-    public TimeSpan PlannedDuration { get; set; }
+    public VisitorStatus Status { get; private set; } = VisitorStatus.Planned;
 
-    public VisitorStatus Status { get; set; } = VisitorStatus.Planned;
+    public DateTime CreatedAt { get; private set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime? ArrivedAt { get; private set; }
 
-    public DateTime? ArrivedAt { get; set; }
+    public DateTime? LeftAt { get; private set; }
 
-    public DateTime? LeftAt { get; set; }
-
-    public string? CreatedByEntraId { get; set; }
-
-    [Required]
-    [MaxLength(50)]
-    public string VisitorToken { get; set; } = string.Empty;
+    public string? CreatedByEntraId { get; private set; }
 
     protected VisitorEntity() : base() { }
 
-    public VisitorEntity(Guid id, string name, string company, TimeSpan plannedDuration, string visitorToken)
-        : base(id, $"{name} from {company}")
+    public VisitorEntity(string name, string company, VisitorStatus status, Guid? id = null)
+        : base(id ?? Guid.CreateVersion7())
     {
         Name = name;
         Company = company;
-        PlannedDuration = plannedDuration;
-        VisitorToken = visitorToken;
         CreatedAt = DateTime.UtcNow;
-        Status = VisitorStatus.Planned;
+        Status = status;
+    }
+
+    public static VisitorEntity CreateVisitorFromKiosk(string name, string company)
+    {
+        return new VisitorEntity(name, company, VisitorStatus.Arrived);
     }
 }
