@@ -1,12 +1,12 @@
-using System;
-using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using Visitor.Web.Features.VisitorManagement.DomainEntities;
 
 namespace Visitor.Web.Infrastructure.Persistance;
 
 public class VisitorDbContext(DbContextOptions<VisitorDbContext> options) : DbContext(options)
 {
-    public DbSet<Features.VisitorManagement.DomainEntities.Visitor> Visitors { get; set; } = null!;
+    public DbSet<VisitorEntity> Visitors { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

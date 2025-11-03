@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Visitor.Web.Infrastructure.Persistance.Configurations;
 
-public class VisitorConfiguration : IEntityTypeConfiguration<Features.VisitorManagement.DomainEntities.Visitor>
+public class VisitorConfiguration : IEntityTypeConfiguration<Features.VisitorManagement.DomainEntities.VisitorEntity>
 {
-    public void Configure(EntityTypeBuilder<Features.VisitorManagement.DomainEntities.Visitor> entity)
+    public void Configure(EntityTypeBuilder<Features.VisitorManagement.DomainEntities.VisitorEntity> entity)
     {
         entity.HasKey(e => e.Id);
         

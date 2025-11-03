@@ -11,9 +11,9 @@ public static class DbSeeder
         // Seed test visitors
         if (!context.Visitors.Any())
         {
-            var visitors = new List<Features.VisitorManagement.DomainEntities.Visitor>
+            var visitors = new List<Features.VisitorManagement.DomainEntities.VisitorEntity>
             {
-                new Features.VisitorManagement.DomainEntities.Visitor(
+                new Features.VisitorManagement.DomainEntities.VisitorEntity(
                     Guid.NewGuid(),
                     "John Doe",
                     "Acme Corp",
@@ -23,7 +23,7 @@ public static class DbSeeder
                     Status = VisitorStatus.Planned,
                     CreatedAt = DateTime.UtcNow
                 },
-                new Features.VisitorManagement.DomainEntities.Visitor(
+                new Features.VisitorManagement.DomainEntities.VisitorEntity(
                     Guid.NewGuid(),
                     "Jane Smith",
                     "TechCo",
