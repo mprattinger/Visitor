@@ -1,4 +1,5 @@
 ﻿@using Visitor.Web.Features.VistorInfo
+@using Visitor.Web.Common.Buttons
 
 @if (VisitorSummary is not null)
 {
@@ -10,7 +11,7 @@
             </div>
             @if (OnArrival.HasDelegate)
             {
-                <button class="btn-arrival" @onclick="() => OnArrival.InvokeAsync(VisitorSummary.Id)">Angekommen</button>
+                <ActionButton CssClass="btn-arrival" OnClick="() => OnArrival.InvokeAsync(VisitorSummary.Id)">Angekommen</ActionButton>
             }
         </div>
     </div>

@@ -2,6 +2,7 @@
 @using FlintSoft.CQRS.Handlers
 @using Visitor.Web.Common.Layout
 @using Visitor.Web.Features.VisitorManagement.DomainEntities
+@using Visitor.Web.Common.Buttons
 
 @layout KioskLayout
 
@@ -47,8 +48,8 @@
             </div>
 
             <div class="button-row">
-                <button type="submit">Anmelden</button>
-                <button @onclick="cancel">Abbrechen</button>
+                <StandardButton ButtonType="submit">Anmelden</StandardButton>
+                <StandardButton OnClick="cancel">Abbrechen</StandardButton>
             </div>
 
         </div>
