@@ -42,7 +42,7 @@ public static class GetDashboardData
             }
             catch (Exception ex)
             {
-                return Error.Failure("DASHBOARD.DATA.FETCH", $"An error occurred while fetching dashboard data: {ex.Message}");
+                return Error.Failure("DASHBOARD.GET", $"An error occurred while fetching dashboard data: {ex.Message}");
             }
         }
     }
