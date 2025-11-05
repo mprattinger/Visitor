@@ -4,12 +4,25 @@
 @using Visitor.Web.Features.DashboardHome.Components
 
 @rendermode InteractiveServer
+@inject NavigationManager Navigation
 
 <PageTitle>Dashboard - Visitor Overview</PageTitle>
 
 <div class="dashboard-container">
-    <h3>Dashboard - Visitor Overview</h3>
-    <p class="dashboard-subtitle">Status for @DateTime.UtcNow.ToString("dddd, dd MMMM yyyy")</p>
+    <div class="dashboard-header">
+        <div>
+            <h3>Dashboard - Visitor Overview</h3>
+            <p class="dashboard-subtitle">Status for @DateTime.UtcNow.ToString("dddd, dd MMMM yyyy")</p>
+        </div>
+        <div class="action-buttons">
+            <button class="btn-action btn-plan" @onclick="OpenPlanVisitModal">Besuch planen</button>
+            <button class="btn-action btn-selfservice" @onclick="OpenSelfService">Self-Service</button>
+        </div>
+    </div>
+
+    <PlanVisitModal IsVisible="showPlanModal" 
+                    OnVisitPlanned="OnVisitPlanned" 
+                    OnClose="ClosePlanVisitModal" />
     @if (dashboardData == null)
     {
         <p><em>Loading...</em></p>
@@ -51,6 +64,7 @@
 
     private DashboardDataDTO? dashboardData;
     private string? errorMessage;
+    private bool showPlanModal = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -70,5 +84,25 @@
         {
             dashboardData = result.Value;
         }
+    }
+
+    private void OpenPlanVisitModal()
+    {
+        showPlanModal = true;
+    }
+
+    private void ClosePlanVisitModal()
+    {
+        showPlanModal = false;
+    }
+
+    private async Task OnVisitPlanned()
+    {
+        await LoadDashboardData();
+    }
+
+    private void OpenSelfService()
+    {
+        Navigation.NavigateTo("/kiosk");
     }
 }
