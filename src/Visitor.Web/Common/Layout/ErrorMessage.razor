@@ -1,0 +1,14 @@
+﻿<div class="error-container">
+    <span>
+        @Message
+    </span>
+    <Cross Clicked="ClearErrors"/>
+</div>
+
+@code {
+    [Parameter]
+    public string Message { get; set; } = "";
+
+    [Parameter]
+    public EventCallback ClearErrors { get; set; }
+}

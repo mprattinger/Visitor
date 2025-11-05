@@ -10,6 +10,11 @@
             <Auth />
         </div>
 
+        @if (Context is not null && Context.HasErrors())
+        {
+            <ErrorMessage Message="@Context.Errors.Last()" ClearErrors="@Context.ClearErrors" />
+        }
+
         <article class="content px-4">
             @Body
         </article>
@@ -21,3 +26,20 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    [CascadingParameter]
+    public ApplicationContext? Context { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (Context is not null)
+        {
+            Context.OnError += () => StateHasChanged();
+            Context.IsBusyChanged += (bool isBusy) =>
+            {
+                StateHasChanged();
+            };
+        }
+    }
+}

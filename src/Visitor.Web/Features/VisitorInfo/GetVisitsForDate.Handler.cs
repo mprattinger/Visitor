@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Visitor.Web.Features.VisitorManagement.DomainEntities;
 using Visitor.Web.Infrastructure.Persistance;
 
-namespace Visitor.Web.Features.DashboardHome;
+namespace Visitor.Web.Features.VistorInfo;
 
 public static class GetDashboardData
 {
@@ -18,10 +18,12 @@ public static class GetDashboardData
             try
             {
                 var today = DateTime.UtcNow.Date;
+                var todayDateOnly = DateOnly.FromDateTime(today);
                 var tomorrow = today.AddDays(1);
+                var tomorrowDateOnly = todayDateOnly.AddDays(1);
 
                 var plannedVisitors = await context.Visitors
-                    .Where(v => v.Status == VisitorStatus.Planned && v.CreatedAt >= today && v.CreatedAt < tomorrow)
+                    .Where(v => v.Status == VisitorStatus.Planned && v.VisitDate >= todayDateOnly && v.VisitDate < tomorrowDateOnly)
                     .OrderBy(v => v.CreatedAt)
                     .Select(v => new VisitorSummaryDTO(v.Id, v.Name, v.Company, v.CreatedAt, v.ArrivedAt, v.LeftAt))
                     .ToListAsync(cancellationToken);

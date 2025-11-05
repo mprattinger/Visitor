@@ -5,7 +5,7 @@ using FluentValidation;
 using Visitor.Web.Features.VisitorManagement.DomainEntities;
 using Visitor.Web.Infrastructure.Persistance;
 
-namespace Visitor.Web.Features.DashboardHome.Components;
+namespace Visitor.Web.Features.PlanVisit;
 
 public static class CreatePlannedVisit
 {
@@ -37,7 +37,13 @@ public static class CreatePlannedVisit
                     return validation.Errors.ConvertAll(error => Error.Validation(error.PropertyName, error.ErrorMessage));
                 }
 
-                var visitor = new VisitorEntity(command.Name, command.Company, VisitorStatus.Planned);
+                var arrival = DateOnly.FromDateTime(DateTime.UtcNow);
+                if (command.ExpectedArrival is not null)
+                {
+                    arrival = DateOnly.FromDateTime(command.ExpectedArrival.Value!.ToUniversalTime());
+                }
+
+                var visitor = new VisitorEntity(command.Name, command.Company, arrival, VisitorStatus.Planned);
 
                 await context.Visitors.AddAsync(visitor, cancellationToken);
                 await context.SaveChangesAsync(cancellationToken);

@@ -1,0 +1,114 @@
+﻿@using Visitor.Web.Features.PlanVisit
+@using Visitor.Web.Features.VistorInfo
+
+<div class="container">
+
+    <div class="header">
+        <div>
+            <h3>Dashboard - Visitor Overview</h3>
+            <p class="subtitle">Status for @DateTime.UtcNow.ToString("dddd, dd MMMM yyyy")</p>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-action btn-plan" @onclick="openPlanVisitModal">Besuch planen</button>
+            <button class="btn-action btn-selfservice" @onclick="openSelfService">Self-Service</button>
+        </div>
+    </div>
+
+    
+
+<PlanVisitModal IsVisible="showPlanModal" 
+                    OnVisitPlanned="OnVisitPlanned" 
+                    OnClose="closePlanVisitModal" />
+
+    @if (dashboardData == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="visitor-sections">
+            <div class="visitor-section planned">
+                <h4>
+                    <span>Geplant (@dashboardData.PlannedVisitors.Count())</span>
+                </h4>
+                @foreach (var v in dashboardData.PlannedVisitors)
+                {
+                    <VisitorInfo VisitorSummary="v" />
+                }
+            </div>
+            <div class="visitor-section active">
+                <h4>
+                    <span>Im Haus (@dashboardData.PlannedVisitors.Count())</span>
+                </h4>
+                @foreach (var v in dashboardData.CurrentlyVisiting)
+                {
+                    <VisitorInfo VisitorSummary="v" />
+                }
+            </div>
+            <div class="visitor-section left">
+                <h4>
+                    <span>Beendet (@dashboardData.PlannedVisitors.Count())</span>
+                </h4>
+                @foreach(var v in dashboardData.AlreadyLeft)
+                {
+                    <VisitorInfo VisitorSummary="v" />
+                }
+            </div>
+        </div>
+    }
+
+
+
+</div>
+
+@code {
+    @inject FlintSoft.CQRS.Handlers.IQueryHandler<GetDashboardData.Query, DashboardDataDTO> getDashboardDataQueryHandler;
+    @inject NavigationManager Navigation
+
+    private DashboardDataDTO? dashboardData;
+    private bool showPlanModal = false;
+
+    [CascadingParameter]
+    public ApplicationContext? Context { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await loadVisitData();
+    }
+
+    async Task loadVisitData()
+    {
+        var result = await getDashboardDataQueryHandler.Handle(new GetDashboardData.Query(), CancellationToken.None);
+
+        if (result.IsError)
+        {
+            var firstError = result.Errors.FirstOrDefault();
+            Context?.AddError(firstError.Description ?? "An unknown error occurred.");
+        }
+        else
+        {
+            dashboardData = result.Value;
+        }
+    }
+
+    private void openPlanVisitModal()
+    {
+        showPlanModal = true;
+    }
+
+    private void closePlanVisitModal()
+    {
+        showPlanModal = false;
+    }
+
+    private async Task OnVisitPlanned()
+    {
+        await loadVisitData();
+    }
+
+    private void openSelfService()
+    {
+        Navigation.NavigateTo("/kiosk");
+    }
+}

@@ -55,14 +55,14 @@ public static class CreateVisitKiosk
                     else
                     {
                         // Planned visitor not found, create new visitor
-                        visit = VisitorEntity.CreateVisitorFromKiosk(command.Name, command.Company);
+                        visit = new VisitorEntity(command.Name, command.Company, DateOnly.FromDateTime(DateTime.UtcNow), VisitorStatus.Arrived);
                         await context.Visitors.AddAsync(visit, cancellationToken);
                     }
                 }
                 else
                 {
                     // No planned visitor ID, create new visitor
-                    visit = VisitorEntity.CreateVisitorFromKiosk(command.Name, command.Company);
+                    visit = new VisitorEntity(command.Name, command.Company, DateOnly.FromDateTime(DateTime.UtcNow), VisitorStatus.Arrived);
                     await context.Visitors.AddAsync(visit, cancellationToken);
                 }
 

@@ -11,10 +11,8 @@ using Visitor.Web.Infrastructure.Persistance;
 namespace Visitor.Web.Migrations
 {
     [DbContext(typeof(VisitorDbContext))]
-    [Migration("20251104191358_optimizing visitor")]
-#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
-    partial class optimizingvisitor
-#pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
+    [Migration("20251105220325_visitat")]
+    partial class visitat
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,6 +50,12 @@ namespace Visitor.Web.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateOnly>("VisitDate")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
