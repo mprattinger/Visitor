@@ -38,11 +38,6 @@ public static class CreatePlannedVisit
                 }
 
                 var visitor = new VisitorEntity(command.Name, command.Company, VisitorStatus.Planned);
-                
-                if (command.ExpectedArrival.HasValue)
-                {
-                    visitor.SetArrivedAt(command.ExpectedArrival.Value);
-                }
 
                 await context.Visitors.AddAsync(visitor, cancellationToken);
                 await context.SaveChangesAsync(cancellationToken);

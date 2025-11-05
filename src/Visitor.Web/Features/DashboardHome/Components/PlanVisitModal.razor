@@ -87,7 +87,7 @@
     {
         Model = new PlannedVisitDTO
         {
-            ExpectedArrival = DateTime.Now.AddMinutes(30) // Default to 30 minutes from now
+            ExpectedArrival = DateTime.UtcNow.AddMinutes(30) // Default to 30 minutes from now
         };
         editContext = new EditContext(Model);
         errorMessage = null;
