@@ -25,11 +25,23 @@ builder.AddFeatures();
 var app = builder.Build();
 
 // Initialize and seed database
-using (var scope = app.Services.CreateScope())
+try
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<VisitorDbContext>();
-    await dbContext.Database.MigrateAsync();
-    await DbSeeder.SeedAsync(dbContext);
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<VisitorDbContext>();
+        
+        // Apply migrations first
+        await dbContext.Database.MigrateAsync();
+        
+        // Seed data immediately after migration in the same scope
+        await DbSeeder.SeedAsync(dbContext);
+    }
+}
+catch (Exception ex)
+{
+    Log.Error(ex, "An error occurred while migrating or seeding the database.");
+    throw;
 }
 
 // Configure the HTTP request pipeline.
