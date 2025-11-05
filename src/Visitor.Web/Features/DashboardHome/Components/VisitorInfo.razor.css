@@ -1,0 +1,23 @@
+﻿.container {
+    border-bottom: 1px solid gray;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    padding-left: .5rem;
+}
+
+    .container:first-of-type {
+        padding-top:0;
+    }
+
+    .container:last-of-type {
+        border: none;
+    }
+
+    .name {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+.company {
+    font-size: .9rem;
+}

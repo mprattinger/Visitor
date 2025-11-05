@@ -1,0 +1,14 @@
+﻿@if (VisitorSummary is not null)
+{
+    <div class="container">
+        <div class="names">
+            <div class="name">@VisitorSummary.Name</div>
+            <div class="company">@VisitorSummary.Company</div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public VisitorSummaryDTO? VisitorSummary { get; set; }
+}
