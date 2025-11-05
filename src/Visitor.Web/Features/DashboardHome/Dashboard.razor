@@ -1,7 +1,220 @@
 ﻿@page "/dashboard"
+@using FlintSoft.CQRS.Interfaces
+@using Visitor.Web.Features.DashboardHome
 
-<h3>Dashboard</h3>
+@rendermode InteractiveServer
+
+<PageTitle>Dashboard - Visitor Overview</PageTitle>
+
+<div class="dashboard-container">
+    <h3>Dashboard - Visitor Overview</h3>
+    <p class="dashboard-subtitle">Status for @DateTime.UtcNow.ToString("dddd, dd MMMM yyyy")</p>
+
+    @if (dashboardData == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else if (errorMessage != null)
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    else
+    {
+        <div class="visitor-sections">
+            <!-- Planned Visitors Section -->
+            <div class="visitor-section">
+                <h4>Not Arrived - Planned Visitors (@dashboardData.PlannedVisitors.Count)</h4>
+                @if (dashboardData.PlannedVisitors.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Company</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var visitor in dashboardData.PlannedVisitors)
+                            {
+                                <tr>
+                                    <td>@visitor.Name</td>
+                                    <td>@visitor.Company</td>
+                                    <td>@visitor.CreatedAt.ToLocalTime().ToString("HH:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="no-visitors">No planned visitors for today.</p>
+                }
+            </div>
+
+            <!-- Currently Visiting Section -->
+            <div class="visitor-section">
+                <h4>Currently Visiting (@dashboardData.CurrentlyVisiting.Count)</h4>
+                @if (dashboardData.CurrentlyVisiting.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Company</th>
+                                <th>Arrived At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var visitor in dashboardData.CurrentlyVisiting)
+                            {
+                                <tr>
+                                    <td>@visitor.Name</td>
+                                    <td>@visitor.Company</td>
+                                    <td>@visitor.ArrivedAt?.ToLocalTime().ToString("HH:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="no-visitors">No visitors currently on-site.</p>
+                }
+            </div>
+
+            <!-- Already Left Section -->
+            <div class="visitor-section">
+                <h4>Already Left (@dashboardData.AlreadyLeft.Count)</h4>
+                @if (dashboardData.AlreadyLeft.Any())
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Company</th>
+                                <th>Arrived At</th>
+                                <th>Left At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var visitor in dashboardData.AlreadyLeft)
+                            {
+                                <tr>
+                                    <td>@visitor.Name</td>
+                                    <td>@visitor.Company</td>
+                                    <td>@visitor.ArrivedAt?.ToLocalTime().ToString("HH:mm")</td>
+                                    <td>@visitor.LeftAt?.ToLocalTime().ToString("HH:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="no-visitors">No visitors have left today.</p>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .dashboard-container {
+        padding: 20px;
+    }
+
+    .dashboard-subtitle {
+        color: #6c757d;
+        margin-bottom: 30px;
+    }
+
+    .visitor-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .visitor-section {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        background-color: #f8f9fa;
+    }
+
+    .visitor-section h4 {
+        margin-top: 0;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+        padding-bottom: 10px;
+    }
+
+    .table {
+        width: 100%;
+        margin-top: 15px;
+        background-color: white;
+        border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table thead th {
+        background-color: #e9ecef;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .no-visitors {
+        color: #6c757d;
+        font-style: italic;
+        margin: 15px 0;
+    }
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+    }
+
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+    }
+</style>
 
 @code {
+    @inject FlintSoft.CQRS.Handlers.IQueryHandler<GetDashboardData.Query, DashboardDataDTO> getDashboardDataQueryHandler;
 
+    private DashboardDataDTO? dashboardData;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardData();
+    }
+
+    private async Task LoadDashboardData()
+    {
+        var result = await getDashboardDataQueryHandler.Handle(new GetDashboardData.Query(), CancellationToken.None);
+        
+        if (result.IsError)
+        {
+            var firstError = result.Errors.FirstOrDefault();
+            errorMessage = firstError.Description ?? "An unknown error occurred.";
+        }
+        else
+        {
+            dashboardData = result.Value;
+        }
+    }
 }
