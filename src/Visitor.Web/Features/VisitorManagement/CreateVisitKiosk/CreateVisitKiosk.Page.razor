@@ -17,15 +17,32 @@
 
         <div class="container">
 
-            <div class="input-wrapper">
-                <input type="text" id="myInput" placeholder=" " @bind-value="Model.Name">
-                <label for="myInput">Name</label>
+            <div class="input-wrapper autocomplete-wrapper">
+                <input type="text" id="nameInput" placeholder=" " 
+                      value="@Model.Name"
+                       @onfocus="OnNameFocus"
+                       @onblur="OnNameBlur"
+                        @oninput="@(e => OnNameInput(e))">
+                <label for="nameInput">Name</label>
                 <ValidationMessage For="@(() => Model.Name)" />
+                
+                @if (showDropdown && searchResults.Any())
+                {
+                    <div class="autocomplete-dropdown">
+                        @foreach (var visitor in searchResults)
+                        {
+                            <div class="autocomplete-item" @onmousedown="@(() => SelectVisitor(visitor))">
+                                <div class="visitor-name">@visitor.Name</div>
+                                <div class="visitor-company">@visitor.Company</div>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
 
             <div class="input-wrapper">
-                <input type="text" id="myInput" placeholder=" " @bind-value="Model.Company">
-                <label for="myInput">Firma</label>
+                <input type="text" id="companyInput" placeholder=" " @bind-value="Model.Company">
+                <label for="companyInput">Firma</label>
                 <ValidationMessage For="@(() => Model.Company)" />
             </div>
 
@@ -40,8 +57,11 @@
 }
 @code {
     @inject ICommandHandler<CreateVisitKiosk.Command, VisitorEntity> createVisitKioskCommandHandler;
+    @inject IQueryHandler<SearchPlannedVisitors.Query, List<VisitorSearchResultDTO>> searchPlannedVisitorsQueryHandler;
 
     private EditContext? editContext;
+    private List<VisitorSearchResultDTO> searchResults = new();
+    private bool showDropdown = false;
 
     [SupplyParameterFromForm]
     private VisitorDTO? Model { get; set; }
@@ -55,9 +75,65 @@
         editContext = new EditContext(Model);
     }
 
+    private async Task OnNameInput(ChangeEventArgs e)
+    {
+        var searchTerm = e.Value?.ToString() ?? string.Empty;
+        Model!.Name = searchTerm;
+
+        if (searchTerm.Length >= 3)
+        {
+            var result = await searchPlannedVisitorsQueryHandler.Handle(
+                new SearchPlannedVisitors.Query(searchTerm), 
+                CancellationToken.None);
+
+            if (!result.IsError)
+            {
+                searchResults = result.Value;
+                showDropdown = searchResults.Any();
+            }
+        }
+        else
+        {
+            searchResults.Clear();
+            showDropdown = false;
+        }
+
+        StateHasChanged();
+    }
+
+    private void OnNameFocus()
+    {
+        if (searchResults.Any() && !string.IsNullOrWhiteSpace(Model?.Name) && Model.Name.Length >= 3)
+        {
+            showDropdown = true;
+        }
+    }
+
+    private void OnNameBlur()
+    {
+        // Delay to allow click events to fire
+        Task.Delay(200).ContinueWith(_ =>
+        {
+            showDropdown = false;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private void SelectVisitor(VisitorSearchResultDTO visitor)
+    {
+        Model!.Id = visitor.Id;
+        Model.Name = visitor.Name;
+        Model.Company = visitor.Company;
+        searchResults.Clear();
+        showDropdown = false;
+        StateHasChanged();
+    }
+
     async Task submit()
     {
-        var result = await createVisitKioskCommandHandler.Handle(new CreateVisitKiosk.Command(Model!.Name, Model!.Company), CancellationToken.None);
+        var result = await createVisitKioskCommandHandler.Handle(
+            new CreateVisitKiosk.Command(Model!.Name, Model!.Company, Model.Id), 
+            CancellationToken.None);
         if(result.IsError)
         {
             return;
@@ -72,6 +148,8 @@
         Model = new VisitorDTO();
         editContext = new EditContext(Model);
         editContext.MarkAsUnmodified(); // Clear validation messages
+        searchResults.Clear();
+        showDropdown = false;
         StateHasChanged();
     }
 }
