@@ -11,38 +11,14 @@ public static class DbSeeder
         // Seed test visitors
         if (!context.Visitors.Any())
         {
-            var visitors = new List<Features.VisitorManagement.DomainEntities.Visitor>
+            var visitors = new List<VisitorEntity>
             {
-                new Features.VisitorManagement.DomainEntities.Visitor(
-                    Guid.NewGuid(),
-                    "John Doe",
-                    "Acme Corp",
-                    TimeSpan.FromHours(2),
-                    GenerateToken())
-                {
-                    Status = VisitorStatus.Planned,
-                    CreatedAt = DateTime.UtcNow
-                },
-                new Features.VisitorManagement.DomainEntities.Visitor(
-                    Guid.NewGuid(),
-                    "Jane Smith",
-                    "TechCo",
-                    TimeSpan.FromHours(1),
-                    GenerateToken())
-                {
-                    Status = VisitorStatus.Arrived,
-                    CreatedAt = DateTime.UtcNow.AddHours(-1),
-                    ArrivedAt = DateTime.UtcNow.AddMinutes(-30)
-                }
+                VisitorEntity.CreateVisitorFromKiosk("John Doe", "Acme Corp"),
+                VisitorEntity.CreateVisitorFromKiosk("Jane Smith", "TechCo"),
             };
 
             context.Visitors.AddRange(visitors);
             await context.SaveChangesAsync();
         }
-    }
-
-    private static string GenerateToken()
-    {
-        return Guid.NewGuid().ToString("N")[..TokenLength].ToUpper();
     }
 }

@@ -1,6 +1,77 @@
 ﻿@page "/kiosk"
-<h3>CreateVisitKiosk.Page</h3>
+@using FlintSoft.CQRS.Handlers
+@using Visitor.Web.Common.Layout
+@using Visitor.Web.Features.VisitorManagement.DomainEntities
 
+@layout KioskLayout
+
+<div class="title">
+    Willkommen, bitte melden Sie sich an
+</div>
+
+@if (Model is not null)
+{
+    <EditForm EditContext="editContext" OnValidSubmit="submit" FormName="kiosk-form">
+        <AntiforgeryToken />
+        <DataAnnotationsValidator />
+
+        <div class="container">
+
+            <div class="input-wrapper">
+                <input type="text" id="myInput" placeholder=" " @bind-value="Model.Name">
+                <label for="myInput">Name</label>
+                <ValidationMessage For="@(() => Model.Name)" />
+            </div>
+
+            <div class="input-wrapper">
+                <input type="text" id="myInput" placeholder=" " @bind-value="Model.Company">
+                <label for="myInput">Firma</label>
+                <ValidationMessage For="@(() => Model.Company)" />
+            </div>
+
+            <div class="button-row">
+                <button type="submit">Anmelden</button>
+                <button @onclick="cancel">Abbrechen</button>
+            </div>
+
+        </div>
+
+    </EditForm>
+}
 @code {
+    @inject ICommandHandler<CreateVisitKiosk.Command, VisitorEntity> createVisitKioskCommandHandler;
 
+    private EditContext? editContext;
+
+    [SupplyParameterFromForm]
+    private VisitorDTO? Model { get; set; }
+
+    override protected void OnInitialized()
+    {
+        if (Model == null)
+        {
+            Model = new VisitorDTO();
+        }
+        editContext = new EditContext(Model);
+    }
+
+    async Task submit()
+    {
+        var result = await createVisitKioskCommandHandler.Handle(new CreateVisitKiosk.Command(Model!.Name, Model!.Company), CancellationToken.None);
+        if(result.IsError)
+        {
+            return;
+        }
+
+        Model = new VisitorDTO();
+        editContext = new EditContext(Model);
+    }
+
+    void cancel()
+    {
+        Model = new VisitorDTO();
+        editContext = new EditContext(Model);
+        editContext.MarkAsUnmodified(); // Clear validation messages
+        StateHasChanged();
+    }
 }

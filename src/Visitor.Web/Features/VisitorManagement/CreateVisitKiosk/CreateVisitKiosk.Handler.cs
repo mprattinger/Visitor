@@ -1,4 +1,3 @@
-using System;
 using ErrorOr;
 using FlintSoft.CQRS.Handlers;
 using FlintSoft.CQRS.Interfaces;
@@ -12,7 +11,7 @@ public static class CreateVisitKiosk
 {
     public record Command(string Name, string Company) : ICommand<VisitorEntity>;
 
-    protected sealed class Validator : AbstractValidator<Command>
+    public class Validator : AbstractValidator<Command>
     {
         public Validator()
         {
@@ -26,7 +25,7 @@ public static class CreateVisitKiosk
         }
     }
 
-    internal sealed class Handler(Logger<Handler> logger, IValidator<Command> validator, VisitorDbContext context) : ICommandHandler<Command, VisitorEntity>
+    internal sealed class Handler(ILogger<Handler> logger, IValidator<Command> validator, VisitorDbContext context) : ICommandHandler<Command, VisitorEntity>
     {
         public async Task<ErrorOr<VisitorEntity>> Handle(Command command, CancellationToken cancellationToken)
         {

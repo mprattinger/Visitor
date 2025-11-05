@@ -34,8 +34,26 @@ public class VisitorEntity : AggregateRoot
         Status = status;
     }
 
+    public void Leave()
+    {
+        SetLeftAt();
+        Status = VisitorStatus.Left;
+    }
+
+    public void SetArrivedAt(DateTime? arrival = null)
+    {
+        ArrivedAt = arrival is null ? DateTime.UtcNow : arrival;
+    }
+
+    public void SetLeftAt(DateTime? left = null)
+    {
+        LeftAt = left is null ? DateTime.UtcNow : left;
+    }
+
     public static VisitorEntity CreateVisitorFromKiosk(string name, string company)
     {
-        return new VisitorEntity(name, company, VisitorStatus.Arrived);
+        var v = new VisitorEntity(name, company, VisitorStatus.Arrived);
+        v.SetArrivedAt();
+        return v;
     }
 }

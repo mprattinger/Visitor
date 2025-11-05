@@ -1,0 +1,89 @@
+﻿.title {
+    text-align: center;
+    padding-top: 4rem;
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.container {
+
+    width: 60%;
+    margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 4rem;
+}
+
+/*label {
+    display: flex;
+    flex-direction: column;
+}
+*/
+.button-row {
+    display: flex;
+    justify-content: end;
+    gap: 2rem;
+}
+
+.container {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: relative;
+    /* Set a height/padding for the wrapper */
+    padding-top: 20px;
+    width: 100%;
+}
+
+    .input-wrapper input {
+        /* Style your input */
+        padding: 10px;
+        font-size: 20px;
+        outline: none;
+        border: none;
+        border-bottom: 1px solid black;
+    }
+
+    .input-wrapper label {
+        position: absolute;
+        top: 62%;
+        left: 10px;
+        transform: translateY(-50%);
+        color: #999;
+        /* Prevent clicks on the label interfering with the input */
+        pointer-events: none;
+        transition: all 0.2s ease-out;
+        font-size: 20px;
+    }
+
+    /* 1. When the input has focus */
+    .input-wrapper input:focus + label,
+    /* 2. When the input has text (i.e., placeholder is NOT shown) */
+    .input-wrapper input:not(:placeholder-shown) + label {
+        top: 10px; /* Move to the top */
+        font-size: 12px; /* Shrink the text */
+        color: #007bff; /* Change color on focus/fill */
+        transform: translateY(0);
+    }
+
+button {
+    outline: none;
+    background-color: #007bff;
+    padding: .7rem 1.5rem;
+    border-radius: .5rem;
+    border: none;
+    color: white;
+    font-weight: bold;
+}
+    button:hover {
+        background-color: #00bfff;
+    }
+    button:active {
+        scale: 0.95;
+    }
