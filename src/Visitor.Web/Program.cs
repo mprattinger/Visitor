@@ -30,12 +30,13 @@ try
     using (var scope = app.Services.CreateScope())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<VisitorDbContext>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         
         // Apply migrations first
         await dbContext.Database.MigrateAsync();
         
         // Seed data immediately after migration in the same scope
-        await DbSeeder.SeedAsync(dbContext);
+        await DbSeeder.SeedAsync(dbContext, logger);
     }
 }
 catch (Exception ex)

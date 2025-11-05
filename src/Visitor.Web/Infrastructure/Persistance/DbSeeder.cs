@@ -1,6 +1,7 @@
 using Visitor.Web.Features.VisitorManagement.DomainEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 
 namespace Visitor.Web.Infrastructure.Persistance;
 
@@ -8,7 +9,7 @@ public static class DbSeeder
 {
     private const int TokenLength = 16;
 
-    public static async Task SeedAsync(VisitorDbContext context)
+    public static async Task SeedAsync(VisitorDbContext context, ILogger? logger = null)
     {
         try
         {
@@ -64,10 +65,14 @@ public static class DbSeeder
                 }
             }
         }
-        catch (Exception)
+        catch (SqliteException ex)
         {
-            // If table doesn't exist yet or any other error, skip seeding
-            // This might happen during migration process
+            // Table might not exist yet during migration - this is expected
+            logger?.LogWarning(ex, "Could not seed database, table may not exist yet");
+        }
+        catch (Exception ex)
+        {
+            logger?.LogError(ex, "Unexpected error while seeding database");
         }
     }
 }
