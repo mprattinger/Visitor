@@ -1,6 +1,7 @@
 @using FlintSoft.CQRS.Handlers
 @using Visitor.Web.Features.VisitorManagement.DomainEntities
 @using System.ComponentModel.DataAnnotations
+@using Visitor.Web.Common.Buttons
 
 @if (IsVisible)
 {
@@ -8,7 +9,7 @@
         <div class="modal-content" @onclick:stopPropagation="true">
             <div class="modal-header">
                 <h3>Besuch planen</h3>
-                <button class="close-button" @onclick="Close">&times;</button>
+                <CloseButton OnClick="Close" />
             </div>
 
             @if (Model is not null)
@@ -38,8 +39,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn-secondary" @onclick="Close">Abbrechen</button>
-                        <button type="submit" class="btn-primary">Besuch planen</button>
+                        <SecondaryButton ButtonType="button" OnClick="Close">Abbrechen</SecondaryButton>
+                        <PrimaryButton ButtonType="submit">Besuch planen</PrimaryButton>
                     </div>
                 </EditForm>
             }

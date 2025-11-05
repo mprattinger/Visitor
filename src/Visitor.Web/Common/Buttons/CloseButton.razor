@@ -1,0 +1,9 @@
+@* Close button component for modals *@
+<button type="button" class="close-button" @onclick="OnClick">
+    &times;
+</button>
+
+@code {
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+}

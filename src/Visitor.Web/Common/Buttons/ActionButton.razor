@@ -1,0 +1,18 @@
+@* Action button component with configurable styling *@
+<button type="@ButtonType" class="btn-action @CssClass" @onclick="OnClick">
+    @ChildContent
+</button>
+
+@code {
+    [Parameter]
+    public string ButtonType { get; set; } = "button";
+
+    [Parameter]
+    public string CssClass { get; set; } = "";
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

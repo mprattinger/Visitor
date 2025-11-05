@@ -1,0 +1,15 @@
+@* Secondary button component for cancel/alternative actions *@
+<button type="@ButtonType" class="btn-secondary" @onclick="OnClick">
+    @ChildContent
+</button>
+
+@code {
+    [Parameter]
+    public string ButtonType { get; set; } = "button";
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}
