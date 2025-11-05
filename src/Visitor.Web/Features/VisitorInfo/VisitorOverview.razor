@@ -1,5 +1,6 @@
 ﻿@using Visitor.Web.Features.PlanVisit
 @using Visitor.Web.Features.VistorInfo
+@using Visitor.Web.Features.VisitorManagement.MarkVisitorArrived
 
 <div class="container">
 
@@ -34,7 +35,7 @@
                 </h4>
                 @foreach (var v in dashboardData.PlannedVisitors)
                 {
-                    <VisitorInfo VisitorSummary="v" />
+                    <VisitorInfo VisitorSummary="v" OnArrival="HandleVisitorArrival" />
                 }
             </div>
             <div class="visitor-section active">
@@ -64,6 +65,7 @@
 
 @code {
     @inject FlintSoft.CQRS.Handlers.IQueryHandler<GetDashboardData.Query, DashboardDataDTO> getDashboardDataQueryHandler;
+    @inject FlintSoft.CQRS.Handlers.ICommandHandler<MarkVisitorArrived.Command, Visitor.Web.Features.VisitorManagement.DomainEntities.VisitorEntity> markVisitorArrivedCommandHandler;
     @inject NavigationManager Navigation
 
     private DashboardDataDTO? dashboardData;
@@ -110,5 +112,21 @@
     private void openSelfService()
     {
         Navigation.NavigateTo("/kiosk");
+    }
+
+    private async Task HandleVisitorArrival(Guid visitorId)
+    {
+        var result = await markVisitorArrivedCommandHandler.Handle(new MarkVisitorArrived.Command(visitorId), CancellationToken.None);
+
+        if (result.IsError)
+        {
+            var firstError = result.Errors.FirstOrDefault();
+            Context?.AddError(firstError?.Description ?? "An error occurred while marking visitor as arrived.");
+        }
+        else
+        {
+            Context?.AddSuccess("Visitor marked as arrived successfully.");
+            await loadVisitData();
+        }
     }
 }

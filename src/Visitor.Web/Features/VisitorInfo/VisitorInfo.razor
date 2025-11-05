@@ -3,9 +3,15 @@
 @if (VisitorSummary is not null)
 {
     <div class="container">
-        <div class="names">
-            <div class="name">@VisitorSummary.Name</div>
-            <div class="company">@VisitorSummary.Company</div>
+        <div class="visitor-content">
+            <div class="names">
+                <div class="name">@VisitorSummary.Name</div>
+                <div class="company">@VisitorSummary.Company</div>
+            </div>
+            @if (OnArrival.HasDelegate)
+            {
+                <button class="btn-arrival" @onclick="() => OnArrival.InvokeAsync(VisitorSummary.Id)">Angekommen</button>
+            }
         </div>
     </div>
 }
@@ -13,4 +19,7 @@
 @code {
     [Parameter]
     public VisitorSummaryDTO? VisitorSummary { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> OnArrival { get; set; }
 }
