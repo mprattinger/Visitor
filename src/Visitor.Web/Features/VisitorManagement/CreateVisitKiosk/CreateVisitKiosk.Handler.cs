@@ -2,6 +2,7 @@ using ErrorOr;
 using FlintSoft.CQRS.Handlers;
 using FlintSoft.CQRS.Interfaces;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Visitor.Web.Features.VisitorManagement.DomainEntities;
 using Visitor.Web.Infrastructure.Persistance;
 
@@ -9,7 +10,7 @@ namespace Visitor.Web.Features.VisitorManagement.CreateVisitKiosk;
 
 public static class CreateVisitKiosk
 {
-    public record Command(string Name, string Company) : ICommand<VisitorEntity>;
+    public record Command(string Name, string Company, Guid? PlannedVisitorId = null) : ICommand<VisitorEntity>;
 
     public class Validator : AbstractValidator<Command>
     {
@@ -37,8 +38,34 @@ public static class CreateVisitKiosk
                     return validation.Errors.ConvertAll(error => Error.Validation(error.PropertyName, error.ErrorMessage));
                 }
 
-                var visit = VisitorEntity.CreateVisitorFromKiosk(command.Name, command.Company);
-                await context.Visitors.AddAsync(visit);
+                VisitorEntity visit;
+
+                // Check if this is a planned visitor checking in
+                if (command.PlannedVisitorId.HasValue)
+                {
+                    visit = await context.Visitors
+                        .FirstOrDefaultAsync(v => v.Id == command.PlannedVisitorId.Value && v.Status == VisitorStatus.Planned, cancellationToken);
+
+                    if (visit != null)
+                    {
+                        // Update the existing planned visitor to arrived status
+                        visit.CheckIn();
+                        context.Visitors.Update(visit);
+                    }
+                    else
+                    {
+                        // Planned visitor not found, create new visitor
+                        visit = VisitorEntity.CreateVisitorFromKiosk(command.Name, command.Company);
+                        await context.Visitors.AddAsync(visit, cancellationToken);
+                    }
+                }
+                else
+                {
+                    // No planned visitor ID, create new visitor
+                    visit = VisitorEntity.CreateVisitorFromKiosk(command.Name, command.Company);
+                    await context.Visitors.AddAsync(visit, cancellationToken);
+                }
+
                 await context.SaveChangesAsync(cancellationToken);
 
                 return visit;

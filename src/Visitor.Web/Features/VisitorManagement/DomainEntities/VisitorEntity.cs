@@ -40,6 +40,12 @@ public class VisitorEntity : AggregateRoot
         Status = VisitorStatus.Left;
     }
 
+    public void CheckIn()
+    {
+        SetArrivedAt();
+        Status = VisitorStatus.Arrived;
+    }
+
     public void SetArrivedAt(DateTime? arrival = null)
     {
         ArrivedAt = arrival is null ? DateTime.UtcNow : arrival;
