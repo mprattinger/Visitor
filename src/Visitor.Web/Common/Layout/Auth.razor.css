@@ -1,0 +1,48 @@
+﻿.container {
+    position: relative;
+    display: inline-block;
+}
+
+.container:hover .subnav {
+    display: block;
+}
+
+
+.avatar {
+    background-color: cornflowerblue;
+    padding: 0.5rem;
+    border-radius: 50%;
+    color: white;
+}
+
+.subnav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: -.5rem;
+    background-color: #f7f7f7;
+    
+}
+
+    .subnav > div {
+        cursor: pointer;
+        padding-top: 0.5rem;
+        padding-right: 1rem;
+        padding-left: 2rem;
+        padding-bottom: 0.5rem;
+        text-decoration: none;
+        color: black;
+    }
+        .subnav > div:hover {
+            background-color: #949494;
+            text-decoration: none;
+        }
+
+        .subnav > div:hover > a{
+            text-decoration: none;
+        }
+
+a {
+    text-decoration: none;
+    color: black;
+}
