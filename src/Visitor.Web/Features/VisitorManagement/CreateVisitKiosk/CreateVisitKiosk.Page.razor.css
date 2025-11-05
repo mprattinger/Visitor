@@ -72,22 +72,6 @@
         transform: translateY(0);
     }
 
-button {
-    outline: none;
-    background-color: #007bff;
-    padding: .7rem 1.5rem;
-    border-radius: .5rem;
-    border: none;
-    color: white;
-    font-weight: bold;
-}
-    button:hover {
-        background-color: #00bfff;
-    }
-    button:active {
-        scale: 0.95;
-    }
-
 /* Autocomplete dropdown styles */
 .autocomplete-wrapper {
     position: relative;

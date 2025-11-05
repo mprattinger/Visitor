@@ -1,5 +1,6 @@
 ﻿@using Visitor.Web.Features.PlanVisit
 @using Visitor.Web.Features.VistorInfo
+@using Visitor.Web.Common.Buttons
 
 <div class="container">
 
@@ -10,8 +11,8 @@
         </div>
 
         <div class="action-buttons">
-            <button class="btn-action btn-plan" @onclick="openPlanVisitModal">Besuch planen</button>
-            <button class="btn-action btn-selfservice" @onclick="openSelfService">Self-Service</button>
+            <ActionButton CssClass="btn-plan" OnClick="openPlanVisitModal">Besuch planen</ActionButton>
+            <ActionButton CssClass="btn-selfservice" OnClick="openSelfService">Self-Service</ActionButton>
         </div>
     </div>
 
