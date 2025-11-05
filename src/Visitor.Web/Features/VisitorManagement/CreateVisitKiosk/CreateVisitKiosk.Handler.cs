@@ -38,13 +38,13 @@ public static class CreateVisitKiosk
                     return validation.Errors.ConvertAll(error => Error.Validation(error.PropertyName, error.ErrorMessage));
                 }
 
-                VisitorEntity visit;
+                VisitorEntity? visit;
 
                 // Check if this is a planned visitor checking in
-                if (command.PlannedVisitorId.HasValue)
+                if (command.PlannedVisitorId is not null)
                 {
                     visit = await context.Visitors
-                        .FirstOrDefaultAsync(v => v.Id == command.PlannedVisitorId.Value && v.Status == VisitorStatus.Planned, cancellationToken);
+                        .FirstOrDefaultAsync(v => v.Id == command.PlannedVisitorId && v.Status == VisitorStatus.Planned, cancellationToken);
 
                     if (visit != null)
                     {

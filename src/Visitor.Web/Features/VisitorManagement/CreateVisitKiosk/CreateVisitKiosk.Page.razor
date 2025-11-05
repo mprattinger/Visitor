@@ -19,11 +19,10 @@
 
             <div class="input-wrapper autocomplete-wrapper">
                 <input type="text" id="nameInput" placeholder=" " 
-                       @bind-value="Model.Name" 
-                       @bind-value:event="oninput"
-                       @oninput="OnNameInput"
+                      value="@Model.Name"
                        @onfocus="OnNameFocus"
-                       @onblur="OnNameBlur">
+                       @onblur="OnNameBlur"
+                        @oninput="@(e => OnNameInput(e))">
                 <label for="nameInput">Name</label>
                 <ValidationMessage For="@(() => Model.Name)" />
                 
