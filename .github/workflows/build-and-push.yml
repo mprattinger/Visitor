@@ -99,9 +99,9 @@ jobs:
           file: ./src/Visitor.Web/Dockerfile
           push: true
           tags: |
-            latest
-            ${{ env.semVer }}
-          build-args: BUILD_VERSION=${{ env.semVer }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.gitversion.outputs.semVer }}
+          build-args: BUILD_VERSION=${{ steps.gitversion.outputs.semVer }}
 
       # - name: Build Docker image (non-main branches)
       #   if: github.ref != 'refs/heads/main'
