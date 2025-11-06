@@ -54,19 +54,8 @@ public static class UpdatePlannedVisit
                     return Error.Validation("PLANNED_VISIT.INVALID_STATUS", "Only planned visits can be updated.");
                 }
 
-                // Use reflection to update the private properties
-                var nameProperty = typeof(VisitorEntity).GetProperty(nameof(VisitorEntity.Name));
-                var companyProperty = typeof(VisitorEntity).GetProperty(nameof(VisitorEntity.Company));
-                var visitDateProperty = typeof(VisitorEntity).GetProperty(nameof(VisitorEntity.VisitDate));
-
-                nameProperty?.SetValue(visitor, command.Name);
-                companyProperty?.SetValue(visitor, command.Company);
-
-                if (command.ExpectedArrival is not null)
-                {
-                    var arrival = DateOnly.FromDateTime(command.ExpectedArrival.Value.ToUniversalTime());
-                    visitDateProperty?.SetValue(visitor, arrival);
-                }
+                var visitDate = DateOnly.FromDateTime(command.ExpectedArrival?.ToUniversalTime() ?? DateTime.UtcNow);
+                visitor.UpdatePlannedVisit(command.Name, command.Company, visitDate);
 
                 await context.SaveChangesAsync(cancellationToken);
 
