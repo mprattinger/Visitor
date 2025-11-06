@@ -1,0 +1,66 @@
+@using Visitor.Web.Features.EditVisit
+@using Visitor.Web.Features.DeletePlannedVisit
+@using Visitor.Web.Features.VisitsWeekOverview
+
+<div class="visits-table-container">
+    @if (Visits == null || !Visits.Any())
+    {
+        <div class="empty-state">
+            <p>Keine geplanten Besuche für diesen Monat</p>
+        </div>
+    }
+    else
+    {
+        <table class="visits-table">
+            <thead>
+                <tr>
+                    <th>Datum & Zeit</th>
+                    <th>Name</th>
+                    <th>Firma</th>
+                    <th>Aktionen</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var visit in Visits)
+                {
+                    var isPast = visit.VisitDate < DateTime.UtcNow;
+                    var rowClass = isPast ? "past-visit" : "";
+                    
+                    <tr class="@rowClass">
+                        <td>@visit.VisitDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@visit.Name</td>
+                        <td>@visit.Company</td>
+                        <td class="actions-cell">
+                            @if (!isPast)
+                            {
+                                <div class="action-buttons">
+                                    <EditVisitModal Visit="@ConvertToVisitDTO(visit)" OnVisitUpdated="OnVisitChanged" />
+                                    <DeleteVisitModal Visit="@ConvertToVisitDTO(visit)" OnVisitDeleted="OnVisitChanged" />
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<MonthVisitDTO>? Visits { get; set; }
+
+    [Parameter]
+    public EventCallback OnVisitChanged { get; set; }
+
+    private VistsAtDateDTO ConvertToVisitDTO(MonthVisitDTO visit)
+    {
+        return new VistsAtDateDTO(
+            visit.Id,
+            visit.Name,
+            visit.Company,
+            visit.VisitDate,
+            visit.CreatedAt
+        );
+    }
+}
