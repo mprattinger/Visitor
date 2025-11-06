@@ -1,0 +1,145 @@
+@using FlintSoft.CQRS.Handlers
+@using Visitor.Web.Features.VisitorManagement.DomainEntities
+@using System.ComponentModel.DataAnnotations
+@using Visitor.Web.Common.Buttons
+
+@if (IsVisible && Visit is not null)
+{
+    <div class="modal-overlay" @onclick="Close">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3>Besuch bearbeiten</h3>
+                <CloseButton OnClick="Close" />
+            </div>
+
+            @if (Model is not null)
+            {
+                <EditForm EditContext="editContext" OnValidSubmit="Submit" FormName="edit-visit-form">
+                    <AntiforgeryToken />
+                    <DataAnnotationsValidator />
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="edit-name">Name</label>
+                            <input type="text" id="edit-name" class="form-control" @bind-value="Model.Name" />
+                            <ValidationMessage For="@(() => Model.Name)" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-company">Firma</label>
+                            <input type="text" id="edit-company" class="form-control" @bind-value="Model.Company" />
+                            <ValidationMessage For="@(() => Model.Company)" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-arrival">Erwartete Ankunft (optional)</label>
+                            <input type="datetime-local" id="edit-arrival" class="form-control" @bind-value="Model.ExpectedArrival" />
+                            <ValidationMessage For="@(() => Model.ExpectedArrival)" />
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <SecondaryButton ButtonType="button" OnClick="Close">Abbrechen</SecondaryButton>
+                        <PrimaryButton ButtonType="submit">Speichern</PrimaryButton>
+                    </div>
+                </EditForm>
+            }
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger">@errorMessage</div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    @inject ICommandHandler<UpdatePlannedVisit.Command, VisitorEntity> updatePlannedVisitHandler;
+
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public NextWorkweekVisitDTO? Visit { get; set; }
+
+    [Parameter]
+    public EventCallback OnVisitUpdated { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [SupplyParameterFromForm]
+    private EditVisitDTO? Model { get; set; }
+
+    private EditContext? editContext;
+    private string? errorMessage;
+
+    protected override void OnParametersSet()
+    {
+        if (IsVisible && Visit is not null && (Model == null || Model.Id != Visit.Id))
+        {
+            ResetForm();
+        }
+    }
+
+    private void ResetForm()
+    {
+        if (Visit is not null)
+        {
+            Model = new EditVisitDTO
+            {
+                Id = Visit.Id,
+                Name = Visit.Name,
+                Company = Visit.Company,
+                ExpectedArrival = Visit.VisitDate.ToDateTime(TimeOnly.MinValue)
+            };
+            editContext = new EditContext(Model);
+            errorMessage = null;
+        }
+    }
+
+    private async Task Submit()
+    {
+        errorMessage = null;
+
+        if (Model is null)
+        {
+            errorMessage = "Ungültige Formulardaten.";
+            return;
+        }
+
+        var result = await updatePlannedVisitHandler.Handle(
+            new UpdatePlannedVisit.Command(Model.Id, Model.Name, Model.Company, Model.ExpectedArrival),
+            CancellationToken.None);
+
+        if (result.IsError)
+        {
+            var firstError = result.Errors.FirstOrDefault();
+            errorMessage = firstError.Description ?? "Ein Fehler ist beim Aktualisieren des Besuchs aufgetreten.";
+            return;
+        }
+
+        await OnVisitUpdated.InvokeAsync();
+        await Close();
+    }
+
+    private async Task Close()
+    {
+        Model = null;
+        errorMessage = null;
+        await OnClose.InvokeAsync();
+    }
+
+    public class EditVisitDTO
+    {
+        public Guid Id { get; set; }
+
+        [Required(ErrorMessage = "Bitte geben Sie den Namen ein")]
+        public string Name { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Bitte geben Sie den Namen der Firma ein")]
+        public string Company { get; set; } = string.Empty;
+
+        public DateTime? ExpectedArrival { get; set; }
+    }
+}

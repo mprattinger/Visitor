@@ -1,0 +1,203 @@
+@using FlintSoft.CQRS.Handlers
+@using Visitor.Web.Common.Buttons
+@using Visitor.Web.Common.Icons
+
+<div class="next-workweek-container">
+    <div class="header">
+        <h3>Geplante Besuche nächste Woche</h3>
+        @if (nextWeekRange is not null)
+        {
+            <span class="date-range">@nextWeekRange</span>
+        }
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="loading">
+            <p>Laden...</p>
+        </div>
+    }
+    else if (visits == null || !visits.Any())
+    {
+        <div class="empty-state">
+            <p>Keine geplanten Besuche für nächste Woche</p>
+        </div>
+    }
+    else
+    {
+        <div class="visits-list">
+            @foreach (var visit in visits)
+            {
+                <div class="visit-card">
+                    <div class="visit-info">
+                        <div class="visit-date">
+                            @visit.VisitDate.ToString("dddd, dd.MM.yyyy", new System.Globalization.CultureInfo("de-DE"))
+                        </div>
+                        <div class="visit-name">@visit.Name</div>
+                        <div class="visit-company">@visit.Company</div>
+                    </div>
+                    <div class="visit-actions">
+                        <ActionButton CssClass="btn-edit" OnClick="() => ShowEditModal(visit)">
+                            <Edit />
+                        </ActionButton>
+                        <ActionButton CssClass="btn-delete" OnClick="() => ShowDeleteConfirmation(visit)">
+                            <Delete />
+                        </ActionButton>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<EditVisitModal 
+    IsVisible="showEditModal"
+    Visit="selectedVisit"
+    OnVisitUpdated="HandleVisitUpdated"
+    OnClose="HideEditModal" />
+
+@if (showDeleteConfirmation)
+{
+    <div class="modal-overlay" @onclick="HideDeleteConfirmation">
+        <div class="confirmation-modal" @onclick:stopPropagation="true">
+            <div class="confirmation-header">
+                <h3>Besuch löschen?</h3>
+            </div>
+            <div class="confirmation-body">
+                <p>Möchten Sie den Besuch von <strong>@selectedVisit?.Name</strong> wirklich löschen?</p>
+            </div>
+            <div class="confirmation-footer">
+                <SecondaryButton ButtonType="button" OnClick="HideDeleteConfirmation">Abbrechen</SecondaryButton>
+                <PrimaryButton ButtonType="button" OnClick="ConfirmDelete">Löschen</PrimaryButton>
+            </div>
+
+            @if (!string.IsNullOrEmpty(deleteErrorMessage))
+            {
+                <div class="alert alert-danger">@deleteErrorMessage</div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    @inject IQueryHandler<GetNextWorkweekVisits.Query, List<NextWorkweekVisitDTO>> getNextWorkweekVisitsHandler;
+    @inject ICommandHandler<DeletePlannedVisit.Command, bool> deletePlannedVisitHandler;
+
+    [CascadingParameter]
+    public ApplicationContext? Context { get; set; }
+
+    private List<NextWorkweekVisitDTO>? visits;
+    private bool isLoading = true;
+    private string? nextWeekRange;
+
+    private bool showEditModal = false;
+    private bool showDeleteConfirmation = false;
+    private NextWorkweekVisitDTO? selectedVisit;
+    private string? deleteErrorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadVisits();
+        CalculateNextWeekRange();
+    }
+
+    private async Task LoadVisits()
+    {
+        isLoading = true;
+        var result = await getNextWorkweekVisitsHandler.Handle(new GetNextWorkweekVisits.Query(), CancellationToken.None);
+
+        if (result.IsError)
+        {
+            var firstError = result.Errors.FirstOrDefault();
+            Context?.AddError(firstError.Description ?? "Ein Fehler ist beim Laden der Besuche für nächste Woche aufgetreten.");
+            visits = new List<NextWorkweekVisitDTO>();
+        }
+        else
+        {
+            visits = result.Value;
+        }
+
+        isLoading = false;
+    }
+
+    private void CalculateNextWeekRange()
+    {
+        var today = DateTime.UtcNow.Date;
+        var currentDayOfWeek = (int)today.DayOfWeek;
+        
+        int daysUntilNextMonday;
+        if (currentDayOfWeek == 0) // Sunday
+        {
+            daysUntilNextMonday = 1;
+        }
+        else if (currentDayOfWeek == 1) // Monday
+        {
+            daysUntilNextMonday = 7;
+        }
+        else
+        {
+            daysUntilNextMonday = 8 - currentDayOfWeek;
+        }
+
+        var nextMonday = today.AddDays(daysUntilNextMonday);
+        var nextFriday = nextMonday.AddDays(4);
+
+        var culture = new System.Globalization.CultureInfo("de-DE");
+        nextWeekRange = $"{nextMonday.ToString("dd.MM.", culture)} - {nextFriday.ToString("dd.MM.yyyy", culture)}";
+    }
+
+    private void ShowEditModal(NextWorkweekVisitDTO visit)
+    {
+        selectedVisit = visit;
+        showEditModal = true;
+    }
+
+    private void HideEditModal()
+    {
+        showEditModal = false;
+        selectedVisit = null;
+    }
+
+    private async Task HandleVisitUpdated()
+    {
+        await LoadVisits();
+    }
+
+    private void ShowDeleteConfirmation(NextWorkweekVisitDTO visit)
+    {
+        selectedVisit = visit;
+        showDeleteConfirmation = true;
+        deleteErrorMessage = null;
+    }
+
+    private void HideDeleteConfirmation()
+    {
+        showDeleteConfirmation = false;
+        selectedVisit = null;
+        deleteErrorMessage = null;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (selectedVisit is null)
+        {
+            return;
+        }
+
+        deleteErrorMessage = null;
+
+        var result = await deletePlannedVisitHandler.Handle(
+            new DeletePlannedVisit.Command(selectedVisit.Id),
+            CancellationToken.None);
+
+        if (result.IsError)
+        {
+            var firstError = result.Errors.FirstOrDefault();
+            deleteErrorMessage = firstError.Description ?? "Ein Fehler ist beim Löschen des Besuchs aufgetreten.";
+            return;
+        }
+
+        HideDeleteConfirmation();
+        await LoadVisits();
+    }
+}

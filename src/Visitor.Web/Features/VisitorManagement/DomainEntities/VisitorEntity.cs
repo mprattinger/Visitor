@@ -62,4 +62,17 @@ public class VisitorEntity : AggregateRoot
     {
         LeftAt = left is null ? DateTime.UtcNow : left;
     }
+
+    public void UpdatePlannedVisit(string name, string company, DateOnly visitDate)
+    {
+        if (Status != VisitorStatus.Planned)
+        {
+            throw new InvalidOperationException("Only planned visits can be updated.");
+        }
+
+        Name = name;
+        Company = company;
+        VisitDate = visitDate;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }
