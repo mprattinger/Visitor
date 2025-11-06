@@ -18,12 +18,12 @@ public static class GetVisitsForMonth
             try
             {
                 var startDate = new DateTime(query.Year, query.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-                var endDate = startDate.AddMonths(1).AddDays(-1).AddHours(23).AddMinutes(59).AddSeconds(59);
+                var endDate = startDate.AddMonths(1);
 
                 var visits = await context.Visitors
                     .Where(v => v.Status == VisitorStatus.Planned
                         && v.VisitDate >= startDate
-                        && v.VisitDate <= endDate)
+                        && v.VisitDate < endDate)
                     .OrderBy(v => v.VisitDate)
                     .ThenBy(v => v.CreatedAt)
                     .Select(v => new MonthVisitDTO(
