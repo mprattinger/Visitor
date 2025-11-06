@@ -1,0 +1,80 @@
+﻿@using Visitor.Web.Features.VisitorManagement.DomainEntities
+@using Visitor.Web.Features.VistorInfo
+
+<div class="visitor-sections">
+    <div class="visitor-section planned">
+        <h4>
+            <span>Geplant (@Data.PlannedVisitors.Count())</span>
+        </h4>
+        @foreach (var v in Data.PlannedVisitors)
+        {
+            <VisitorInfo VisitorSummary="v" OnArrival="HandleVisitorArrival" />
+        }
+    </div>
+    <div class="visitor-section active">
+        <h4>
+            <span>Im Haus (@Data.CurrentlyVisiting.Count())</span>
+        </h4>
+        @foreach (var v in Data.CurrentlyVisiting)
+        {
+            <VisitorInfo VisitorSummary="v" OnLeave="HandleVisitorLeave" />
+        }
+    </div>
+    <div class="visitor-section left">
+        <h4>
+            <span>Beendet (@Data.AlreadyLeft.Count())</span>
+        </h4>
+        @foreach (var v in Data.AlreadyLeft)
+        {
+            <VisitorInfo VisitorSummary="v" />
+        }
+    </div>
+</div>
+
+@code {
+    @inject ICommandHandler<MarkVisitorArrived.Command, VisitorEntity> markVisitorArrivedCommandHandler;
+    @inject ICommandHandler<VisitorLeaves.Command, VisitorEntity> visitorLeavesCommandHandler;
+
+    [CascadingParameter]
+    public ApplicationContext? Context { get; set; }
+
+    [Parameter]
+    public DashboardDataDTO Data { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    private async Task HandleVisitorArrival(Guid visitorId)
+    {
+        var result = await markVisitorArrivedCommandHandler.Handle(new MarkVisitorArrived.Command(visitorId), CancellationToken.None);
+
+        if (result.IsError)
+        {
+            var firstError = result.Errors.FirstOrDefault();
+            Context?.AddError(firstError.Description ?? "An error occurred while marking visitor as arrived.");
+            return;
+        }
+
+        if (OnChange.HasDelegate)
+        {
+            await OnChange.InvokeAsync();
+        }
+    }
+
+    async Task HandleVisitorLeave(Guid visitorId)
+    {
+        var result = await visitorLeavesCommandHandler.Handle(new VisitorLeaves.Command(visitorId), CancellationToken.None);
+
+        if (result.IsError)
+        {
+            var firstError = result.Errors.FirstOrDefault();
+            Context?.AddError(firstError.Description ?? "An error occurred while marking visitor as left.");
+            return;
+        }
+
+        if (OnChange.HasDelegate)
+        {
+            await OnChange.InvokeAsync();
+        }
+    }
+}

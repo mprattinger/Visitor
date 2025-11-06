@@ -1,76 +1,23 @@
-﻿@using Visitor.Web.Features.PlanVisit
-@using Visitor.Web.Features.VistorInfo
-@using Visitor.Web.Features.VisitorManagement.MarkVisitorArrived
-@using Visitor.Web.Common.Buttons
+﻿@using Visitor.Web.Features.VistorInfo
 
 <div class="container">
-
-    <div class="header">
-        <div>
-            <h3>Dashboard - Visitor Overview</h3>
-            <p class="subtitle">Status for @DateTime.UtcNow.ToString("dddd, dd MMMM yyyy")</p>
-        </div>
-
-        <div class="action-buttons">
-            <ActionButton CssClass="btn-plan" OnClick="openPlanVisitModal">Besuch planen</ActionButton>
-            <ActionButton CssClass="btn-selfservice" OnClick="openSelfService">Self-Service</ActionButton>
-        </div>
-    </div>
-
+    <VisitorOverviewHeader OnChange="loadVisitData" />
     
-
-<PlanVisitModal IsVisible="showPlanModal" 
-                    OnVisitPlanned="OnVisitPlanned" 
-                    OnClose="closePlanVisitModal" />
-
     @if (dashboardData == null)
     {
         <p><em>Loading...</em></p>
     }
     else
     {
-        <div class="visitor-sections">
-            <div class="visitor-section planned">
-                <h4>
-                    <span>Geplant (@dashboardData.PlannedVisitors.Count())</span>
-                </h4>
-                @foreach (var v in dashboardData.PlannedVisitors)
-                {
-                    <VisitorInfo VisitorSummary="v" OnArrival="HandleVisitorArrival" />
-                }
-            </div>
-            <div class="visitor-section active">
-                <h4>
-                    <span>Im Haus (@dashboardData.CurrentlyVisiting.Count())</span>
-                </h4>
-                @foreach (var v in dashboardData.CurrentlyVisiting)
-                {
-                    <VisitorInfo VisitorSummary="v" />
-                }
-            </div>
-            <div class="visitor-section left">
-                <h4>
-                    <span>Beendet (@dashboardData.AlreadyLeft.Count())</span>
-                </h4>
-                @foreach(var v in dashboardData.AlreadyLeft)
-                {
-                    <VisitorInfo VisitorSummary="v" />
-                }
-            </div>
-        </div>
+        <VisitorOverviewSections Data="dashboardData" OnChange="loadVisitData" />
     }
-
-
-
 </div>
 
 @code {
-    @inject FlintSoft.CQRS.Handlers.IQueryHandler<GetDashboardData.Query, DashboardDataDTO> getDashboardDataQueryHandler;
-    @inject FlintSoft.CQRS.Handlers.ICommandHandler<MarkVisitorArrived.Command, Visitor.Web.Features.VisitorManagement.DomainEntities.VisitorEntity> markVisitorArrivedCommandHandler;
-    @inject NavigationManager Navigation
-
+    @inject IQueryHandler<GetDashboardData.Query, DashboardDataDTO> getDashboardDataQueryHandler;
+    
     private DashboardDataDTO? dashboardData;
-    private bool showPlanModal = false;
+    
 
     [CascadingParameter]
     public ApplicationContext? Context { get; set; }
@@ -88,46 +35,16 @@
         {
             var firstError = result.Errors.FirstOrDefault();
             Context?.AddError(firstError.Description ?? "An unknown error occurred.");
+            return;
         }
-        else
-        {
-            dashboardData = result.Value;
-        }
+        
+        dashboardData = result.Value;
     }
 
-    private void openPlanVisitModal()
-    {
-        showPlanModal = true;
-    }
+    
 
-    private void closePlanVisitModal()
-    {
-        showPlanModal = false;
-    }
+    
 
-    private async Task OnVisitPlanned()
-    {
-        await loadVisitData();
-    }
-
-    private void openSelfService()
-    {
-        Navigation.NavigateTo("/kiosk");
-    }
-
-    private async Task HandleVisitorArrival(Guid visitorId)
-    {
-        var result = await markVisitorArrivedCommandHandler.Handle(new MarkVisitorArrived.Command(visitorId), CancellationToken.None);
-
-        if (result.IsError)
-        {
-            var firstError = result.Errors.FirstOrDefault();
-            Context?.AddError(firstError?.Description ?? "An error occurred while marking visitor as arrived.");
-        }
-        else
-        {
-            Context?.AddSuccess("Visitor marked as arrived successfully.");
-            await loadVisitData();
-        }
-    }
+   
+   
 }

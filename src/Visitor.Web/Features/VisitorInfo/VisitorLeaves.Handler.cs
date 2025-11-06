@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Visitor.Web.Features.VisitorManagement.DomainEntities;
 using Visitor.Web.Infrastructure.Persistance;
 
-namespace Visitor.Web.Features.VisitorManagement.MarkVisitorArrived;
+namespace Visitor.Web.Features.VisitorInfo;
 
-public static class MarkVisitorArrived
+public static class VisitorLeaves
 {
     public record Command(Guid VisitorId) : ICommand<VisitorEntity>;
 
@@ -25,12 +25,12 @@ public static class MarkVisitorArrived
                     return Error.NotFound("VISITOR.NOT_FOUND", "Visitor not found.");
                 }
 
-                if (visitor.Status != VisitorStatus.Planned)
+                if (visitor.Status != VisitorStatus.Arrived)
                 {
-                    return Error.Validation("VISITOR.INVALID_STATUS", "Visitor must be in planned status to mark as arrived.");
+                    return Error.Validation("VISITOR.INVALID_STATUS", "Visitor must be in arrived status to mark as left.");
                 }
 
-                visitor.CheckIn();
+                visitor.Leave();
                 context.Visitors.Update(visitor);
                 await context.SaveChangesAsync(cancellationToken);
 
@@ -38,8 +38,8 @@ public static class MarkVisitorArrived
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An error occurred while marking visitor as arrived: {err}", ex.Message);
-                return Error.Failure("VISITOR.MARK_ARRIVED", "An error occurred while marking visitor as arrived.");
+                logger.LogError(ex, "An error occurred while marking visitor as left: {err}", ex.Message);
+                return Error.Failure("VISITOR.LEAVES", "An error occurred while marking visitor as left.");
             }
         }
     }

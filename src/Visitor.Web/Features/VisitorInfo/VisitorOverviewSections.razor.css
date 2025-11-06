@@ -1,0 +1,42 @@
+﻿.visitor-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.visitor-section {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e1e0e0;
+    border-radius: .5rem;
+}
+
+    .visitor-section > h4 {
+        background-color: #f4f4f4;
+        padding-top: 1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-bottom: .6rem;
+        border: 1px solid #f4f4f4;
+        border-top-left-radius: .4rem;
+        border-top-right-radius: .4rem;
+    }
+
+        .visitor-section > h4 > span {
+            border-bottom: 1px solid #bdbdbd;
+            display: flex;
+            padding-bottom: 0.3rem;
+        }
+
+@media (min-width: 641px) {
+
+    .visitor-sections {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .visitor-section {
+        width: 30%;
+    }
+}
