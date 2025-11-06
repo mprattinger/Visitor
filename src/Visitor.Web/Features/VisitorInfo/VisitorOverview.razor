@@ -1,5 +1,6 @@
 ﻿@using Visitor.Web.Features.PlanVisit
 @using Visitor.Web.Features.VistorInfo
+@using Visitor.Web.Features.VisitorManagement.MarkVisitorArrived
 @using Visitor.Web.Common.Buttons
 
 <div class="container">
@@ -35,12 +36,12 @@
                 </h4>
                 @foreach (var v in dashboardData.PlannedVisitors)
                 {
-                    <VisitorInfo VisitorSummary="v" />
+                    <VisitorInfo VisitorSummary="v" OnArrival="HandleVisitorArrival" />
                 }
             </div>
             <div class="visitor-section active">
                 <h4>
-                    <span>Im Haus (@dashboardData.PlannedVisitors.Count())</span>
+                    <span>Im Haus (@dashboardData.CurrentlyVisiting.Count())</span>
                 </h4>
                 @foreach (var v in dashboardData.CurrentlyVisiting)
                 {
@@ -49,7 +50,7 @@
             </div>
             <div class="visitor-section left">
                 <h4>
-                    <span>Beendet (@dashboardData.PlannedVisitors.Count())</span>
+                    <span>Beendet (@dashboardData.AlreadyLeft.Count())</span>
                 </h4>
                 @foreach(var v in dashboardData.AlreadyLeft)
                 {
@@ -65,6 +66,7 @@
 
 @code {
     @inject FlintSoft.CQRS.Handlers.IQueryHandler<GetDashboardData.Query, DashboardDataDTO> getDashboardDataQueryHandler;
+    @inject FlintSoft.CQRS.Handlers.ICommandHandler<MarkVisitorArrived.Command, Visitor.Web.Features.VisitorManagement.DomainEntities.VisitorEntity> markVisitorArrivedCommandHandler;
     @inject NavigationManager Navigation
 
     private DashboardDataDTO? dashboardData;
@@ -111,5 +113,21 @@
     private void openSelfService()
     {
         Navigation.NavigateTo("/kiosk");
+    }
+
+    private async Task HandleVisitorArrival(Guid visitorId)
+    {
+        var result = await markVisitorArrivedCommandHandler.Handle(new MarkVisitorArrived.Command(visitorId), CancellationToken.None);
+
+        if (result.IsError)
+        {
+            var firstError = result.Errors.FirstOrDefault();
+            Context?.AddError(firstError?.Description ?? "An error occurred while marking visitor as arrived.");
+        }
+        else
+        {
+            Context?.AddSuccess("Visitor marked as arrived successfully.");
+            await loadVisitData();
+        }
     }
 }

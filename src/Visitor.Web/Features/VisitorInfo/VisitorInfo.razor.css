@@ -13,11 +13,32 @@
         border: none;
     }
 
-    .name {
-        font-size: 1rem;
-        font-weight: bold;
-    }
+.visitor-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.names {
+    flex-grow: 1;
+}
+
+.name {
+    font-size: 1rem;
+    font-weight: bold;
+}
 
 .company {
     font-size: .9rem;
 }
+
+.btn-arrival {
+    background-color: #10b981;
+    color: white;
+    white-space: nowrap;
+}
+
+    .btn-arrival:hover {
+        background-color: #059669;
+    }

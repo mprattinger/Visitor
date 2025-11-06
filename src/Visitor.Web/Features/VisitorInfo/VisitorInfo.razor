@@ -1,11 +1,18 @@
 ﻿@using Visitor.Web.Features.VistorInfo
+@using Visitor.Web.Common.Buttons
 
 @if (VisitorSummary is not null)
 {
     <div class="container">
-        <div class="names">
-            <div class="name">@VisitorSummary.Name</div>
-            <div class="company">@VisitorSummary.Company</div>
+        <div class="visitor-content">
+            <div class="names">
+                <div class="name">@VisitorSummary.Name</div>
+                <div class="company">@VisitorSummary.Company</div>
+            </div>
+            @if (OnArrival.HasDelegate)
+            {
+                <ActionButton CssClass="btn-arrival" OnClick="() => OnArrival.InvokeAsync(VisitorSummary.Id)">Angekommen</ActionButton>
+            }
         </div>
     </div>
 }
@@ -13,4 +20,7 @@
 @code {
     [Parameter]
     public VisitorSummaryDTO? VisitorSummary { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> OnArrival { get; set; }
 }
