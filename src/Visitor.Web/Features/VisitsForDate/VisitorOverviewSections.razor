@@ -1,0 +1,48 @@
+﻿@using Visitor.Web.Features.VisitorInfo
+@using Visitor.Web.Features.VisitorManagement.DomainEntities
+@using Visitor.Web.Features.VisitsForDate
+
+<div class="visitor-sections">
+    <div class="visitor-section planned">
+        <h4>
+            <span>Geplant (@Data.PlannedVisitors.Count())</span>
+        </h4>
+        @foreach (var v in Data.PlannedVisitors)
+        {
+            <VisitorInfo VisitorSummary="v" OnChange="OnChange" />
+        }
+    </div>
+    <div class="visitor-section active">
+        <h4>
+            <span>Im Haus (@Data.CurrentlyVisiting.Count())</span>
+        </h4>
+        @foreach (var v in Data.CurrentlyVisiting)
+        {
+            <VisitorInfo VisitorSummary="v" OnChange="OnChange" />
+        }
+    </div>
+    <div class="visitor-section left">
+        <h4>
+            <span>Beendet (@Data.AlreadyLeft.Count())</span>
+        </h4>
+        @foreach (var v in Data.AlreadyLeft)
+        {
+            <VisitorInfo VisitorSummary="v" />
+        }
+    </div>
+</div>
+
+@code {
+    
+
+    [CascadingParameter]
+    public ApplicationContext? Context { get; set; }
+
+    [Parameter]
+    public DashboardDataDTO Data { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    
+}

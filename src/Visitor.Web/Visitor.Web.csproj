@@ -30,8 +30,4 @@
     <PackageReference Include="Serilog.Sinks.Console" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\PlanVisit\" />
-  </ItemGroup>
-
 </Project>

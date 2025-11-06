@@ -13,7 +13,7 @@ public class VisitorEntity : AggregateRoot
     [MaxLength(100)]
     public string Company { get; private set; } = string.Empty;
 
-    public DateOnly VisitDate { get; private set; }
+    public DateTime VisitDate { get; private set; }
 
     public VisitorStatus Status { get; private set; } = VisitorStatus.Planned;
 
@@ -30,7 +30,7 @@ public class VisitorEntity : AggregateRoot
     protected VisitorEntity() : base() { }
 
 
-    public VisitorEntity(string name, string company, DateOnly visitDate, VisitorStatus status, Guid? id = null)
+    public VisitorEntity(string name, string company, DateTime visitDate, VisitorStatus status, Guid? id = null)
         : base(id ?? Guid.CreateVersion7())
     {
         Name = name;
@@ -63,7 +63,7 @@ public class VisitorEntity : AggregateRoot
         LeftAt = left is null ? DateTime.UtcNow : left;
     }
 
-    public void UpdatePlannedVisit(string name, string company, DateOnly visitDate)
+    public void UpdatePlannedVisit(string name, string company, DateTime visitDate)
     {
         if (Status != VisitorStatus.Planned)
         {

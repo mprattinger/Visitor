@@ -1,0 +1,42 @@
+﻿@using Visitor.Web.Common.Buttons
+@using Visitor.Web.Features.PlanVisit
+
+<div class="header">
+    <div>
+        <h3>Besucher Tagesübersicht</h3>
+        <p class="subtitle">Status für @ForDate.ToLocalTime().ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("de-DE"))</p>
+    </div>
+
+    <div class="action-buttons">
+        <PlanVisit OnVisitPlanned="OnVisitPlanned" />
+        <GreenButton OnClick="openSelfService">
+            Self-Service
+        </GreenButton>
+    </div>
+</div>
+
+@code {
+    @inject NavigationManager Navigation
+
+    [CascadingParameter]
+    public ApplicationContext? Context { get; set; }
+
+    [Parameter, EditorRequired]
+    public DateTime ForDate { get; set; }
+
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    private void openSelfService()
+    {
+        Navigation.NavigateTo("/kiosk");
+    }
+
+    private async Task OnVisitPlanned()
+    {
+        if (OnChange.HasDelegate)
+        {
+            await OnChange.InvokeAsync();
+        }
+    }
+}

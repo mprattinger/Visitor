@@ -37,10 +37,10 @@ public static class CreatePlannedVisit
                     return validation.Errors.ConvertAll(error => Error.Validation(error.PropertyName, error.ErrorMessage));
                 }
 
-                var arrival = DateOnly.FromDateTime(DateTime.UtcNow);
+                var arrival = DateTime.UtcNow;
                 if (command.ExpectedArrival is not null)
                 {
-                    arrival = DateOnly.FromDateTime(command.ExpectedArrival.Value!.ToUniversalTime());
+                    arrival = command.ExpectedArrival.Value!.ToUniversalTime();
                 }
 
                 var visitor = new VisitorEntity(command.Name, command.Company, arrival, VisitorStatus.Planned);

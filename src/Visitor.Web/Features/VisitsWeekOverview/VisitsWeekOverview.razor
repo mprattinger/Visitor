@@ -1,0 +1,156 @@
+@using FlintSoft.CQRS.Handlers
+@using Visitor.Web.Common.Buttons
+@using Visitor.Web.Features.DeletePlannedVisit
+@using Visitor.Web.Features.EditVisit
+@using Visitor.Web.Features.VisitorInfo
+
+@if (isLoading)
+{
+    <div class="loading">
+        <p>Laden...</p>
+    </div>
+}
+else if (visits == null || !visits.Any())
+{
+    <div class="empty-state">
+        <p>Keine geplanten Besuche für nächste Woche</p>
+    </div>
+}
+else
+{
+    <div class="container">
+        <div class="header">
+            <h3>Besucher Wochenübersicht</h3>
+        </div>
+        <div class="content">
+            @foreach (var d in daysList)
+            {
+                <div class="day-container">
+                    <div class="header-row">
+                        <div class="header-row-text">
+                            <div class="day-header">@d.ToString("dddd", new System.Globalization.CultureInfo("de-DE"))</div>
+                            <div class="day-header-date">
+                                @d.ToString("dd.MM.yyyy", new System.Globalization.CultureInfo("de-DE"))
+                            </div>
+                        </div>
+@*                         <div class="header-row-action">
+                            <PrimaryButton>
+                                <Plus />
+                            </PrimaryButton>
+                        </div> *@
+                    </div>
+                    <div class="visits-list">
+                        @if (visits.First(x => x.Date.Date == d.Date).Visits.Any())
+                        {
+                            @foreach (var visit in visits.First(x => x.Date.Date == d.Date).Visits)
+                            {
+                                <VisitorDetail Name="@visit.Name" Company="@visit.Company" />
+                            }
+                        }
+                        else
+                        {
+                            <p>Keine geplanten Besuche</p>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    @inject IQueryHandler<GetVisitsForWeek.Query, List<NextWorkweekVisitDTO>> getNextWorkweekVisitsHandler;
+
+    private List<DateTime> daysList = [];
+    private List<NextWorkweekVisitDTO>? visits;
+    private bool isLoading = true;
+
+    [CascadingParameter]
+    public ApplicationContext? Context { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var (start, end) = Extensions.GetWeek();
+
+        while (start < end)
+        {
+            if (start.DayOfWeek == DayOfWeek.Saturday || start.DayOfWeek == DayOfWeek.Sunday)
+            {
+                start = start.AddDays(1);
+                continue;
+            }
+
+            daysList.Add(start);
+            start = start.AddDays(1);
+        }
+
+        await LoadVisits();
+    }
+
+    // @inject IQueryHandler<GetVisitsForWeek.Query, List<NextWorkweekVisitDTO>> getNextWorkweekVisitsHandler;
+
+    // private List<NextWorkweekVisitDTO>? visits;
+    // private bool isLoading = true;
+    // private string? nextWeekRange;
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     await LoadVisits();
+    //     CalculateNextWeekRange();
+    // }
+
+    private async Task LoadVisits()
+    {
+        isLoading = true;
+        var result = await getNextWorkweekVisitsHandler.Handle(new GetVisitsForWeek.Query(), CancellationToken.None);
+
+        if (result.IsError)
+        {
+            var firstError = result.Errors.FirstOrDefault();
+            Context?.AddError(firstError.Description ?? "Ein Fehler ist beim Laden der Besuche für nächste Woche aufgetreten.");
+            visits = new List<NextWorkweekVisitDTO>();
+        }
+        else
+        {
+            visits = result.Value;
+        }
+
+        isLoading = false;
+    }
+
+    // private void CalculateNextWeekRange()
+    // {
+    //     var today = DateTime.UtcNow.Date;
+    //     var currentDayOfWeek = (int)today.DayOfWeek;
+
+    //     int daysUntilNextMonday;
+    //     if (currentDayOfWeek == 0) // Sunday
+    //     {
+    //         daysUntilNextMonday = 1;
+    //     }
+    //     else if (currentDayOfWeek == 1) // Monday
+    //     {
+    //         daysUntilNextMonday = 7;
+    //     }
+    //     else
+    //     {
+    //         daysUntilNextMonday = 8 - currentDayOfWeek;
+    //     }
+
+    //     var nextMonday = today.AddDays(daysUntilNextMonday);
+    //     var nextFriday = nextMonday.AddDays(4);
+
+    //     var culture = new System.Globalization.CultureInfo("de-DE");
+    //     nextWeekRange = $"{nextMonday.ToString("dd.MM.", culture)} - {nextFriday.ToString("dd.MM.yyyy", culture)}";
+    // }
+
+    // private async Task HandleVisitUpdated()
+    // {
+    //     await LoadVisits();
+    // }
+
+    // private async Task HandleVisitDeleted()
+    // {
+    //     await LoadVisits();
+    // }
+}

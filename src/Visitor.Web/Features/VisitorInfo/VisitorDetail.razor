@@ -1,0 +1,23 @@
+﻿<div class="container">
+    <div class="names">
+        <div class="name">@Name</div>
+        <div class="company">@Company</div>
+    </div>
+    <div class="action">
+        @if (ChildContent is not null)
+        {
+            @ChildContent
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Name { get; set; }
+
+    [Parameter, EditorRequired]
+    public string Company { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Visitor.Web.Features.VisitorManagement.DomainEntities;
 using Visitor.Web.Infrastructure.Persistance;
 
-namespace Visitor.Web.Features.PlanVisit;
+namespace Visitor.Web.Features.EditVisit;
 
 public static class UpdatePlannedVisit
 {
@@ -55,8 +55,8 @@ public static class UpdatePlannedVisit
                 }
 
                 var visitDate = command.ExpectedArrival.HasValue
-                    ? DateOnly.FromDateTime(command.ExpectedArrival.Value.ToUniversalTime())
-                    : visitor.VisitDate;
+                    ? command.ExpectedArrival.Value.ToUniversalTime()
+                    : visitor.VisitDate.ToUniversalTime();
                 visitor.UpdatePlannedVisit(command.Name, command.Company, visitDate);
 
                 await context.SaveChangesAsync(cancellationToken);

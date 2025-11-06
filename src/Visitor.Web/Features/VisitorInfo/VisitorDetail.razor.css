@@ -1,0 +1,23 @@
+﻿.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.names {
+}
+
+.name {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.company {
+    font-size: .9rem;
+}
+
+.action {
+    display: flex;
+    padding-right: .5rem;
+}

@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Visitor.Web.Features.VisitorManagement.DomainEntities;
 using Visitor.Web.Infrastructure.Persistance;
 
-namespace Visitor.Web.Features.VistorInfo;
+namespace Visitor.Web.Features.VisitsForDate;
 
-public static class GetDashboardData
+public static class GetVisitsForDate
 {
-    public record Query : IQuery<DashboardDataDTO>;
+    public record Query(DateTime ForDate) : IQuery<DashboardDataDTO>;
 
     internal sealed class Handler(VisitorDbContext context) : IQueryHandler<Query, DashboardDataDTO>
     {
@@ -17,27 +17,25 @@ public static class GetDashboardData
         {
             try
             {
-                var today = DateTime.UtcNow.Date;
-                var todayDateOnly = DateOnly.FromDateTime(today);
-                var tomorrow = today.AddDays(1);
-                var tomorrowDateOnly = todayDateOnly.AddDays(1);
+                var forDate = query.ForDate.Date.ToUniversalTime();
+                var nextDate = forDate.AddDays(1);
 
                 var plannedVisitors = await context.Visitors
-                    .Where(v => v.Status == VisitorStatus.Planned && v.VisitDate >= todayDateOnly && v.VisitDate < tomorrowDateOnly)
+                    .Where(v => v.Status == VisitorStatus.Planned && v.VisitDate >= forDate && v.VisitDate < nextDate)
                     .OrderBy(v => v.CreatedAt)
-                    .Select(v => new VisitorSummaryDTO(v.Id, v.Name, v.Company, v.CreatedAt, v.ArrivedAt, v.LeftAt))
+                    .Select(v => new VisitorSummaryDTO(v.Id, v.Name, v.Company, v.CreatedAt, v.ArrivedAt, v.LeftAt, v.Status))
                     .ToListAsync(cancellationToken);
 
                 var currentlyVisiting = await context.Visitors
-                    .Where(v => v.Status == VisitorStatus.Arrived && v.ArrivedAt >= today && v.ArrivedAt < tomorrow)
+                    .Where(v => v.Status == VisitorStatus.Arrived && v.ArrivedAt >= forDate && v.ArrivedAt < nextDate)
                     .OrderBy(v => v.ArrivedAt)
-                    .Select(v => new VisitorSummaryDTO(v.Id, v.Name, v.Company, v.CreatedAt, v.ArrivedAt, v.LeftAt))
+                    .Select(v => new VisitorSummaryDTO(v.Id, v.Name, v.Company, v.CreatedAt, v.ArrivedAt, v.LeftAt, v.Status))
                     .ToListAsync(cancellationToken);
 
                 var alreadyLeft = await context.Visitors
-                    .Where(v => v.Status == VisitorStatus.Left && v.LeftAt >= today && v.LeftAt < tomorrow)
+                    .Where(v => v.Status == VisitorStatus.Left && v.LeftAt >= forDate && v.LeftAt < nextDate)
                     .OrderBy(v => v.LeftAt)
-                    .Select(v => new VisitorSummaryDTO(v.Id, v.Name, v.Company, v.CreatedAt, v.ArrivedAt, v.LeftAt))
+                    .Select(v => new VisitorSummaryDTO(v.Id, v.Name, v.Company, v.CreatedAt, v.ArrivedAt, v.LeftAt, v.Status))
                     .ToListAsync(cancellationToken);
 
                 return new DashboardDataDTO(plannedVisitors, currentlyVisiting, alreadyLeft);
@@ -62,5 +60,6 @@ public record VisitorSummaryDTO(
     string Company,
     DateTime CreatedAt,
     DateTime? ArrivedAt,
-    DateTime? LeftAt
+    DateTime? LeftAt,
+    VisitorStatus Status
 );

@@ -1,7 +1,7 @@
-﻿@using Visitor.Web.Features.VistorInfo
+﻿@using Visitor.Web.Features.VisitsForDate
 
 <div class="container">
-    <VisitorOverviewHeader OnChange="loadVisitData" />
+    <VisitorOverviewHeader OnChange="loadVisitData" ForDate="DateTime.Now.Date" />
     
     @if (dashboardData == null)
     {
@@ -14,7 +14,7 @@
 </div>
 
 @code {
-    @inject IQueryHandler<GetDashboardData.Query, DashboardDataDTO> getDashboardDataQueryHandler;
+    @inject IQueryHandler<GetVisitsForDate.Query, DashboardDataDTO> getDashboardDataQueryHandler;
     
     private DashboardDataDTO? dashboardData;
     
@@ -29,7 +29,7 @@
 
     async Task loadVisitData()
     {
-        var result = await getDashboardDataQueryHandler.Handle(new GetDashboardData.Query(), CancellationToken.None);
+        var result = await getDashboardDataQueryHandler.Handle(new GetVisitsForDate.Query(DateTime.Now.Date), CancellationToken.None);
 
         if (result.IsError)
         {
@@ -40,11 +40,4 @@
         
         dashboardData = result.Value;
     }
-
-    
-
-    
-
-   
-   
 }

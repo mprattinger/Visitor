@@ -15,11 +15,6 @@
     padding: 4rem;
 }
 
-/*label {
-    display: flex;
-    flex-direction: column;
-}
-*/
 .button-row {
     display: flex;
     justify-content: end;

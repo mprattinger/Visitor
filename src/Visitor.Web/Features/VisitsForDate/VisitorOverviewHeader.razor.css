@@ -15,25 +15,6 @@
     align-self: end;
 }
 
-::deep .btn-plan {
-    background-color: #3b82f6;
-    color: white;
-}
-
-    ::deep .btn-plan:hover {
-        background-color: #2563eb;
-    }
-
-::deep .btn-selfservice {
-    background-color: #10b981;
-    color: white;
-}
-
-    ::deep .btn-selfservice:hover {
-        background-color: #059669;
-    }
-
-
 @media (min-width: 641px) {
 
     .header {

@@ -1,0 +1,50 @@
+﻿@using Visitor.Web.Common.Buttons
+@using Visitor.Web.Common.Modals
+@using Visitor.Web.Features.VisitsWeekOverview
+
+<RedButton OnClick="() => showModal = true">
+                            <Delete />
+                        </RedButton>
+
+<YesNoModal ShowModal="showModal" Title="Besuch löschen?" OnResult="handleResult">
+    <p>Möchten Sie den Besuch von <strong>@Visit?.Name</strong> wirklich löschen?</p>
+</YesNoModal>
+
+@code {
+    @inject ICommandHandler<DeletePlannedVisit.Command, bool> deletePlannedVisitHandler;
+
+    private bool showModal = false;
+
+    [CascadingParameter]
+    public ApplicationContext? Context { get; set; }
+
+    [Parameter]
+    public EventCallback OnVisitDeleted { get; set; }
+
+    [Parameter]
+    public VistsAtDateDTO? Visit { get; set; }
+
+    async Task handleResult(bool confirmed)
+    {
+        if (confirmed)
+        {
+            if (Visit is null)
+            {
+                return;
+            }
+
+            var result = await deletePlannedVisitHandler.Handle(
+                new DeletePlannedVisit.Command(Visit.Id),
+                CancellationToken.None);
+
+            if (result.IsError)
+            {
+                var firstError = result.Errors.FirstOrDefault();
+                Context?.AddError(firstError.Description ?? "Ein Fehler ist beim Löschen des Besuchs aufgetreten.");
+                return;
+            }
+            
+        }
+        showModal = false;
+    }
+}

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Visitor.Web.Features.VisitorManagement.DomainEntities;
 using Visitor.Web.Infrastructure.Persistance;
 
-namespace Visitor.Web.Features.PlanVisit;
+namespace Visitor.Web.Features.DeletePlannedVisit;
 
 public static class DeletePlannedVisit
 {

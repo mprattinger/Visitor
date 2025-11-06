@@ -1,0 +1,47 @@
+﻿@using Visitor.Web.Common.Buttons
+<Modal IsVisible="ShowModal" OnClose="handleClose" Title="Title">
+    @ChildContent
+
+    <div class="confirmation-footer">
+        <PrimaryButton ButtonType="button" OnClick="onYes">Ja</PrimaryButton>
+        <SecondaryButton ButtonType="button" OnClick="onNo">Nein</SecondaryButton>
+    </div>
+
+    @*     <div class="confirmation-body">
+                <p>Möchten Sie den Besuch von <strong>@selectedVisit?.Name</strong> wirklich löschen?</p>
+            </div>
+            <div class="confirmation-footer">
+                <SecondaryButton ButtonType="button" OnClick="HideDeleteConfirmation">Abbrechen</SecondaryButton>
+                <PrimaryButton ButtonType="button" OnClick="ConfirmDelete">Löschen</PrimaryButton>
+            </div> *@
+</Modal>
+
+@code {
+    [Parameter, EditorRequired]
+    public bool ShowModal { get; set; }
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnResult { get; set; }
+
+    void onYes()
+    {
+        OnResult.InvokeAsync(true);
+    }
+
+    void onNo()
+    {
+        OnResult.InvokeAsync(false);
+    }
+
+    void handleClose()
+    {
+        ShowModal = false;
+        OnResult.InvokeAsync(false);
+    }
+}

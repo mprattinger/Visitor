@@ -1,12 +1,14 @@
 ﻿@page "/dashboard"
 @using FlintSoft.CQRS.Interfaces
 @using Visitor.Web.Features.DashboardHome
+@using Visitor.Web.Features.VisitsForDate
+@using Visitor.Web.Features.VisitsWeekOverview
 
 <PageTitle>Dashboard</PageTitle>
 
-<Visitor.Web.Features.PlanVisit.NextWorkweekVisits />
+<VisitorOverview />
 
-<Visitor.Web.Features.VisitorInfo.VisitorOverview />
+<VisitsWeekOverview />
 
 @code {
 }
