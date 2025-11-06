@@ -109,7 +109,7 @@
         if (result.IsError)
         {
             var firstError = result.Errors.FirstOrDefault();
-            Context?.AddError(firstError.Description ?? "An error occurred while loading next week's visits.");
+            Context?.AddError(firstError.Description ?? "Ein Fehler ist beim Laden der Besuche für nächste Woche aufgetreten.");
             visits = new List<NextWorkweekVisitDTO>();
         }
         else
@@ -193,7 +193,7 @@
         if (result.IsError)
         {
             var firstError = result.Errors.FirstOrDefault();
-            deleteErrorMessage = firstError.Description ?? "An error occurred while deleting the visit.";
+            deleteErrorMessage = firstError.Description ?? "Ein Fehler ist beim Löschen des Besuchs aufgetreten.";
             return;
         }
 

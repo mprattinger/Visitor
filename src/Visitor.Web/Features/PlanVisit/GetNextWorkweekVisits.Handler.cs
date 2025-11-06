@@ -41,7 +41,6 @@ public static class GetNextWorkweekVisits
                 var nextMonday = today.AddDays(daysUntilNextMonday);
                 var nextMondayDateOnly = DateOnly.FromDateTime(nextMonday);
                 var nextFridayDateOnly = nextMondayDateOnly.AddDays(4); // Monday + 4 = Friday
-                var followingSaturday = nextFridayDateOnly.AddDays(1);
 
                 var plannedVisits = await context.Visitors
                     .Where(v => v.Status == VisitorStatus.Planned 

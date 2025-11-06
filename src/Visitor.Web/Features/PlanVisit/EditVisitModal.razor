@@ -104,7 +104,7 @@
 
         if (Model is null)
         {
-            errorMessage = "Invalid form data.";
+            errorMessage = "Ungültige Formulardaten.";
             return;
         }
 
@@ -115,7 +115,7 @@
         if (result.IsError)
         {
             var firstError = result.Errors.FirstOrDefault();
-            errorMessage = firstError.Description ?? "An error occurred while updating the visit.";
+            errorMessage = firstError.Description ?? "Ein Fehler ist beim Aktualisieren des Besuchs aufgetreten.";
             return;
         }
 

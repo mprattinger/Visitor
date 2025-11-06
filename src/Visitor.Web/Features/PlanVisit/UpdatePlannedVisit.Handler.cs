@@ -54,7 +54,9 @@ public static class UpdatePlannedVisit
                     return Error.Validation("PLANNED_VISIT.INVALID_STATUS", "Only planned visits can be updated.");
                 }
 
-                var visitDate = DateOnly.FromDateTime(command.ExpectedArrival?.ToUniversalTime() ?? DateTime.UtcNow);
+                var visitDate = command.ExpectedArrival.HasValue
+                    ? DateOnly.FromDateTime(command.ExpectedArrival.Value.ToUniversalTime())
+                    : visitor.VisitDate;
                 visitor.UpdatePlannedVisit(command.Name, command.Company, visitDate);
 
                 await context.SaveChangesAsync(cancellationToken);
