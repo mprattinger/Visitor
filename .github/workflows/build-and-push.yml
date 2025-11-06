@@ -7,14 +7,36 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: visitor
 
 jobs:
-  build-and-test:
+  tests:
     runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --configuration Release --no-restore
+
+  build:
+    runs-on: ubuntu-latest
+    needs: tests
     permissions:
       contents: read
       packages: write
@@ -22,22 +44,33 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
           dotnet-quality: 'preview'
+      
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v1
+        with:
+          versionSpec: "5.x"
+      
+      - name: Run GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v1
+        with:
+          useConfigFile: true
+          configFilePath: GitVersion.yml
 
       - name: Restore dependencies
         run: dotnet restore
 
       - name: Build
         run: dotnet build --no-restore --configuration Release
-
-      - name: Test
-        run: dotnet test --no-build --configuration Release --verbosity normal
-        continue-on-error: true  # Continue even if no tests are found
 
       - name: Log in to GitHub Container Registry
         if: github.ref == 'refs/heads/main'
@@ -47,15 +80,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata for Docker
-        if: github.ref == 'refs/heads/main'
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=latest
-            type=sha,prefix={{branch}}-
+      # - name: Extract metadata for Docker
+      #   if: github.ref == 'refs/heads/main'
+      #   id: meta
+      #   uses: docker/metadata-action@v5
+      #   with:
+      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      #     tags: |
+      #       type=raw,value=latest
+      #       type=sha,prefix={{branch}}-
 
       - name: Build and push Docker image
         if: github.ref == 'refs/heads/main'
@@ -64,14 +97,16 @@ jobs:
           context: .
           file: ./src/Visitor.Web/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            latest
+            ${{ env.semVer }}
+          build-args: BUILD_VERSION=${{ env.semVer }}
 
-      - name: Build Docker image (non-main branches)
-        if: github.ref != 'refs/heads/main'
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./src/Visitor.Web/Dockerfile
-          push: false
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
+      # - name: Build Docker image (non-main branches)
+      #   if: github.ref != 'refs/heads/main'
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     file: ./src/Visitor.Web/Dockerfile
+      #     push: false
+      #     tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
