@@ -144,12 +144,12 @@
     border-top: 1px solid #e5e7eb;
 }
 
-.btn-danger {
+.confirmation-footer .btn-primary {
     background-color: #ef4444;
     color: white;
 }
 
-.btn-danger:hover {
+.confirmation-footer .btn-primary:hover {
     background-color: #dc2626;
 }
 
