@@ -9,6 +9,8 @@ using Visitor.Web.Infrastructure.Persistance;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
@@ -23,6 +25,8 @@ builder.AddInfrastructure();
 builder.AddFeatures();
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

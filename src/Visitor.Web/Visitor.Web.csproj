@@ -30,4 +30,8 @@
     <PackageReference Include="Serilog.Sinks.Console" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Visitor.ServiceDefaults\Visitor.ServiceDefaults.csproj" />
+  </ItemGroup>
+
 </Project>
