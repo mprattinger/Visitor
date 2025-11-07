@@ -1,4 +1,5 @@
-﻿@using Visitor.Web.Common.Buttons
+﻿@using Visitor.Shared.Common.Interfaces
+@using Visitor.Web.Common.Buttons
 @using Visitor.Web.Features.PlanVisit
 
 <div class="header">
@@ -16,7 +17,7 @@
 </div>
 
 @code {
-    @inject NavigationManager Navigation
+    @inject IVisitCommunicationService communicationService;
 
     [CascadingParameter]
     public ApplicationContext? Context { get; set; }
@@ -27,9 +28,19 @@
     [Parameter]
     public EventCallback OnChange { get; set; }
 
-    private void openSelfService()
+    protected override async Task OnInitializedAsync()
     {
-        Navigation.NavigateTo("/kiosk");
+        communicationService.OnMessageReceived += (msg) =>
+        {
+
+        };
+
+        await communicationService.CreateHub();
+    }
+
+    private async Task openSelfService()
+    {
+        await communicationService.SendMessage("self-service");
     }
 
     private async Task OnVisitPlanned()
@@ -38,5 +49,10 @@
         {
             await OnChange.InvokeAsync();
         }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await communicationService.DisposeAsync();
     }
 }

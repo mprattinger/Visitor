@@ -1,7 +1,10 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.Visitor_Web>("visitor-web");
+var web = builder.AddProject<Projects.Visitor_Web>("visitor-web");
 
-builder.AddProject<Projects.Visitor_Kiosk>("visitor-kiosk");
+var client = builder.AddProject<Projects.Visitor_Kiosk>("visitor-kiosk")
+    .WaitFor(web)
+    .WithEnvironment("ServerUrlHttps", web.GetEndpoint("https"))
+    .WithEnvironment("ServerUrlHttp", web.GetEndpoint("http"));
 
 builder.Build().Run();

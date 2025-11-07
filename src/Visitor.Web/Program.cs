@@ -1,5 +1,3 @@
-
-
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Visitor.Web.Common.Layout;
