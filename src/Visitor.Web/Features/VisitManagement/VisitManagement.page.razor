@@ -1,0 +1,82 @@
+@page "/visit-management"
+@using FlintSoft.CQRS.Handlers
+@using Visitor.Web.Features.PlanVisit
+@using Visitor.Web.Common.Buttons
+
+<PageTitle>Besuchsverwaltung</PageTitle>
+
+<div class="visit-management-container">
+    <div class="header">
+        <h1>Besuchsverwaltung</h1>
+        <div class="header-actions">
+            <PlanVisit OnVisitPlanned="HandleVisitChanged" />
+        </div>
+    </div>
+
+    <MonthNavigation Year="@currentYear" Month="@currentMonth" OnMonthChanged="HandleMonthChanged" />
+
+    @if (isLoading)
+    {
+        <div class="loading">
+            <p>Laden...</p>
+        </div>
+    }
+    else
+    {
+        <VisitsTable Visits="@visits" OnVisitChanged="HandleVisitChanged" />
+    }
+</div>
+
+@code {
+    @inject IQueryHandler<GetVisitsForMonth.Query, List<MonthVisitDTO>> getVisitsForMonthHandler;
+
+    [CascadingParameter]
+    public ApplicationContext? Context { get; set; }
+
+    private int currentYear;
+    private int currentMonth;
+    private List<MonthVisitDTO>? visits;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var now = DateTime.UtcNow;
+        currentYear = now.Year;
+        currentMonth = now.Month;
+        await LoadVisits();
+    }
+
+    private async Task HandleMonthChanged((int Year, int Month) newDate)
+    {
+        currentYear = newDate.Year;
+        currentMonth = newDate.Month;
+        await LoadVisits();
+    }
+
+    private async Task HandleVisitChanged()
+    {
+        await LoadVisits();
+    }
+
+    private async Task LoadVisits()
+    {
+        isLoading = true;
+        
+        var result = await getVisitsForMonthHandler.Handle(
+            new GetVisitsForMonth.Query(currentYear, currentMonth),
+            CancellationToken.None);
+
+        if (result.IsError)
+        {
+            var firstError = result.Errors.FirstOrDefault();
+            Context?.AddError(firstError.Description ?? "Ein Fehler ist beim Laden der Besuche aufgetreten.");
+            visits = new List<MonthVisitDTO>();
+        }
+        else
+        {
+            visits = result.Value;
+        }
+
+        isLoading = false;
+    }
+}

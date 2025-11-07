@@ -43,7 +43,8 @@
                 Context?.AddError(firstError.Description ?? "Ein Fehler ist beim Löschen des Besuchs aufgetreten.");
                 return;
             }
-            
+
+            await OnVisitDeleted.InvokeAsync();
         }
         showModal = false;
     }
