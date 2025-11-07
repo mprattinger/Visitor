@@ -32,28 +32,28 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-if (app.Environment.IsDevelopment())
+// Initialize and seed database
+try
 {
-    // Initialize and seed database
-    try
+    using (var scope = app.Services.CreateScope())
     {
-        using (var scope = app.Services.CreateScope())
+        var dbContext = scope.ServiceProvider.GetRequiredService<VisitorDbContext>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+        // Apply migrations first
+        await dbContext.Database.MigrateAsync();
+
+        if (app.Environment.IsDevelopment())
         {
-            var dbContext = scope.ServiceProvider.GetRequiredService<VisitorDbContext>();
-            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-
-            // Apply migrations first
-            await dbContext.Database.MigrateAsync();
-
             // Seed data immediately after migration in the same scope
             await DbSeeder.SeedAsync(dbContext, logger);
         }
     }
-    catch (Exception ex)
-    {
-        Log.Error(ex, "An error occurred while migrating or seeding the database.");
-        throw;
-    }
+}
+catch (Exception ex)
+{
+    Log.Error(ex, "An error occurred while migrating or seeding the database.");
+    throw;
 }
 
 app.UseStatusCodePagesWithReExecute("/not-found");
