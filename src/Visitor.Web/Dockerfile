@@ -42,7 +42,4 @@ ENV BUILD_VERSION=$BUILD_VERSION
 
 COPY --from=publish /app/publish .
 
-RUN mkdir -p /data
-RUN chmod -R 777 /data
-
 ENTRYPOINT ["dotnet", "Visitor.Web.dll"]
