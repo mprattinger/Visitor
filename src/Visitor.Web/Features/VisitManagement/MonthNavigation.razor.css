@@ -1,0 +1,39 @@
+.month-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.month-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    min-width: 200px;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+.nav-button {
+    background: var(--bs-primary);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.nav-button:hover {
+    background: var(--bs-primary-dark, #0056b3);
+}
+
+.nav-button:active {
+    transform: scale(0.95);
+}

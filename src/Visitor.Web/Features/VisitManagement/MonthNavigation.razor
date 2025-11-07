@@ -1,0 +1,37 @@
+@using System.Globalization
+
+<div class="month-navigation">
+    <button class="nav-button" @onclick="OnPreviousMonth">
+        <span class="bi bi-chevron-left"></span>
+    </button>
+    <h2 class="month-title">@MonthTitle</h2>
+    <button class="nav-button" @onclick="OnNextMonth">
+        <span class="bi bi-chevron-right"></span>
+    </button>
+</div>
+
+@code {
+    [Parameter]
+    public int Year { get; set; }
+
+    [Parameter]
+    public int Month { get; set; }
+
+    [Parameter]
+    public EventCallback<(int Year, int Month)> OnMonthChanged { get; set; }
+
+    private string MonthTitle => new DateTime(Year, Month, 1)
+        .ToString("MMMM yyyy", new CultureInfo("de-DE"));
+
+    private async Task OnPreviousMonth()
+    {
+        var newDate = new DateTime(Year, Month, 1).AddMonths(-1);
+        await OnMonthChanged.InvokeAsync((newDate.Year, newDate.Month));
+    }
+
+    private async Task OnNextMonth()
+    {
+        var newDate = new DateTime(Year, Month, 1).AddMonths(1);
+        await OnMonthChanged.InvokeAsync((newDate.Year, newDate.Month));
+    }
+}
