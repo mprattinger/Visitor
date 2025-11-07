@@ -22,6 +22,18 @@ builder.Services.AddRazorComponents()
 builder.AddInfrastructure();
 builder.AddFeatures();
 
+var clientUrl = builder.Configuration["ClientUrlHttps"] ?? "";
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(clientUrl)
+            .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
@@ -63,8 +75,12 @@ app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 
+app.UseCors();
+
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.UseInfrastructure();
 
 app.Run();

@@ -1,8 +1,7 @@
 <Solution>
-  <Project Path="src/Visitor.AppHost/Visitor.AppHost.csproj" Id="6b1ee5cd-7426-4bda-b205-0bb061a3168e" />
-  <Project Path="src/Visitor.Kiosk/Visitor.Kiosk.Client/Visitor.Kiosk.Client.csproj" />
-  <Project Path="src/Visitor.Kiosk/Visitor.Kiosk/Visitor.Kiosk.csproj" />
-  <Project Path="src/Visitor.ServiceDefaults/Visitor.ServiceDefaults.csproj" />
+  <Project Path="src/aspire/Visitor.AppHost/Visitor.AppHost.csproj" Id="6b1ee5cd-7426-4bda-b205-0bb061a3168e" />
+  <Project Path="src/aspire/Visitor.ServiceDefaults/Visitor.ServiceDefaults.csproj" />
   <Project Path="src/Visitor.Web/Visitor.Web.csproj" Id="bf6357f4-9e1c-4706-94a2-33d0f3083a23" />
-  <Project Path="Visitor.Shared/Visitor.Shared.csproj" />
+  <Project Path="src/Visitor.Shared/Visitor.Shared.csproj" />
+  <Project Path="Visitor.Kiosk/Visitor.Kiosk.csproj" />
 </Solution>

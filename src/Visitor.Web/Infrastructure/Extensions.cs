@@ -12,4 +12,11 @@ public static class Extensions
 
         return builder;
     }
+
+    public static IEndpointRouteBuilder UseInfrastructure(this IEndpointRouteBuilder app)
+    {
+        app?.UseCommunication();
+
+        return app;
+    }
 }

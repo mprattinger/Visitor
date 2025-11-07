@@ -32,12 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Visitor.Shared\Visitor.Shared.csproj" />
-    <ProjectReference Include="..\Visitor.ServiceDefaults\Visitor.ServiceDefaults.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Common\Interfaces\" />
+    <ProjectReference Include="..\aspire\Visitor.ServiceDefaults\Visitor.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Visitor.Shared\Visitor.Shared.csproj" />
   </ItemGroup>
 
 </Project>
