@@ -30,6 +30,8 @@ public class VisitCommunicationClientService(IConfiguration configuration, Navig
         });
 
         await _hubConnection.StartAsync();
+
+        await _hubConnection.SendAsync("Hello", $"kiosk;{_hubConnection.ConnectionId};");
     }
 
     public async Task SendMessage(string message)

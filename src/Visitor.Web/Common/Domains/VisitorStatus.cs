@@ -1,4 +1,4 @@
-namespace Visitor.Web.Features.VisitorManagement.DomainEntities;
+namespace Visitor.Web.Common.Domains;
 
 public enum VisitorStatus
 {

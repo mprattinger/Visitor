@@ -2,7 +2,7 @@ using ErrorOr;
 using FlintSoft.CQRS.Handlers;
 using FlintSoft.CQRS.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Visitor.Web.Features.VisitorManagement.DomainEntities;
+using Visitor.Web.Common.Domains;
 using Visitor.Web.Infrastructure.Persistance;
 
 namespace Visitor.Web.Features.DeletePlannedVisit;

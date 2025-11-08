@@ -7,7 +7,6 @@ public class VisitCommunicationService(IHubContext<VisitHub> hubContext) : IVisi
 {
     public async Task Broadcast(string message)
     {
-        //hubContext.Clients.
         await hubContext.Clients.All.SendAsync("Broadcast", message);
     }
 }

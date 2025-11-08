@@ -1,6 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Visitor.Web.Features.VisitorManagement.DomainEntities;
+using Visitor.Web.Common.Domains;
 
 namespace Visitor.Web.Infrastructure.Persistance;
 
