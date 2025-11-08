@@ -1,5 +1,3 @@
-
-
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Visitor.Web.Common.Layout;
@@ -8,6 +6,8 @@ using Visitor.Web.Infrastructure;
 using Visitor.Web.Infrastructure.Persistance;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -22,7 +22,21 @@ builder.Services.AddRazorComponents()
 builder.AddInfrastructure();
 builder.AddFeatures();
 
+var clientUrl = builder.Configuration["ClientUrlHttps"] ?? "";
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(clientUrl)
+            .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -61,8 +75,12 @@ app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 
+app.UseCors();
+
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.UseInfrastructure();
 
 app.Run();

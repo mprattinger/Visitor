@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using Visitor.Web.Infrastructure.Communication;
 using Visitor.Web.Infrastructure.Persistance;
 
 namespace Visitor.Web.Infrastructure;
@@ -7,10 +7,16 @@ public static class Extensions
 {
     public static IHostApplicationBuilder AddInfrastructure(this IHostApplicationBuilder builder)
     {
-        // Add DbContext
-        builder.Services.AddDbContext<VisitorDbContext>(options =>
-            options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.AddPersistance();
+        builder.AddCommunication();
 
         return builder;
+    }
+
+    public static IEndpointRouteBuilder? UseInfrastructure(this IEndpointRouteBuilder? app)
+    {
+        app?.UseCommunication();
+
+        return app;
     }
 }

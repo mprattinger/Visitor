@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using Visitor.Web.Features.VisitorManagement.DomainEntities;
+using Visitor.Web.Common.Domains;
 
 namespace Visitor.Web.Infrastructure.Persistance;
 

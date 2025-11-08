@@ -1,0 +1,33 @@
+﻿@page "/"
+@using Visitor.Kiosk.Common.Interfaces
+
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+Message: @(message == "" ? "No Message" : message)
+
+@code {
+    @inject IVisitCommunicationClientService service;
+
+    string message = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        service.OnMessageReceived += (msg) =>
+        {
+            message = msg;
+            StateHasChanged();
+        };
+
+        await service.CreateHub();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await service.DisposeAsync();
+    }
+}

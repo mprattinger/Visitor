@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Visitor.Web.Common.Domain;
 
-namespace Visitor.Web.Features.VisitorManagement.DomainEntities;
+namespace Visitor.Web.Common.Domains;
 
 public class VisitorEntity : AggregateRoot
 {

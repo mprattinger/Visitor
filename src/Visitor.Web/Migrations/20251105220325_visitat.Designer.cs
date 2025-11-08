@@ -12,7 +12,9 @@ namespace Visitor.Web.Migrations
 {
     [DbContext(typeof(VisitorDbContext))]
     [Migration("20251105220325_visitat")]
+#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
     partial class visitat
+#pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
