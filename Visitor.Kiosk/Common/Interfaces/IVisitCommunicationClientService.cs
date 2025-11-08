@@ -7,4 +7,5 @@ public interface IVisitCommunicationClientService
     Task CreateHub();
     ValueTask DisposeAsync();
     Task SendMessage(string message);
+    Task SendVisitorCheckIn(string name, string company);
 }
