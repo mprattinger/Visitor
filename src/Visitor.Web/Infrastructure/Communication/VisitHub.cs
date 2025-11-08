@@ -16,6 +16,25 @@ public class VisitHub(VisitorDbContext dbContext, ILogger<VisitHub> logger, IVis
     {
         try
         {
+            // Validate input
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                logger.LogWarning("Visitor check-in rejected: Name is required");
+                throw new ArgumentException("Name is required", nameof(name));
+            }
+
+            if (name.Length > 100)
+            {
+                logger.LogWarning("Visitor check-in rejected: Name exceeds maximum length");
+                throw new ArgumentException("Name must not exceed 100 characters", nameof(name));
+            }
+
+            if (!string.IsNullOrWhiteSpace(company) && company.Length > 100)
+            {
+                logger.LogWarning("Visitor check-in rejected: Company exceeds maximum length");
+                throw new ArgumentException("Company must not exceed 100 characters", nameof(company));
+            }
+
             logger.LogInformation("Visitor check-in received: {Name}, {Company}", name, company);
 
             // Create new visitor entity

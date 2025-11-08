@@ -50,8 +50,12 @@ public class VisitCommunicationClientService(IConfiguration configuration, Navig
         await _hubConnection.SendAsync("VisitorCheckIn", name, company);
     }
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        throw new NotImplementedException();
+        if (_hubConnection != null)
+        {
+            await _hubConnection.DisposeAsync();
+            _hubConnection = null;
+        }
     }
 }
