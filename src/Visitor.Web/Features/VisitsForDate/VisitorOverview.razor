@@ -1,4 +1,6 @@
 ﻿@using Visitor.Web.Features.VisitsForDate
+@using Visitor.Web.Common.Interfaces
+@implements IDisposable
 
 <div class="container">
     <VisitorOverviewHeader OnChange="loadVisitData" ForDate="DateTime.Now.Date" />
@@ -15,6 +17,7 @@
 
 @code {
     @inject IQueryHandler<GetVisitsForDate.Query, DashboardDataDTO> getDashboardDataQueryHandler;
+    @inject IVisitorUpdateNotifier visitorUpdateNotifier;
     
     private DashboardDataDTO? dashboardData;
     
@@ -25,6 +28,18 @@
     protected override async Task OnInitializedAsync()
     {
         await loadVisitData();
+        
+        // Subscribe to visitor updates
+        visitorUpdateNotifier.OnVisitorUpdated += HandleVisitorUpdate;
+    }
+
+    void HandleVisitorUpdate()
+    {
+        InvokeAsync(async () =>
+        {
+            await loadVisitData();
+            StateHasChanged();
+        });
     }
 
     async Task loadVisitData()
@@ -39,5 +54,10 @@
         }
         
         dashboardData = result.Value;
+    }
+
+    public void Dispose()
+    {
+        visitorUpdateNotifier.OnVisitorUpdated -= HandleVisitorUpdate;
     }
 }

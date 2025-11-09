@@ -42,8 +42,20 @@ public class VisitCommunicationClientService(IConfiguration configuration, Navig
         await _hubConnection.SendAsync("SendMessage", message);
     }
 
-    public ValueTask DisposeAsync()
+    public async Task SendVisitorCheckIn(string name, string company)
     {
-        throw new NotImplementedException();
+        if (_hubConnection == null)
+            throw new InvalidOperationException("Connection not started.");
+
+        await _hubConnection.SendAsync("VisitorCheckIn", name, company);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection != null)
+        {
+            await _hubConnection.DisposeAsync();
+            _hubConnection = null;
+        }
     }
 }

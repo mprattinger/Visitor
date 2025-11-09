@@ -10,6 +10,7 @@ public static class Extensions
         builder.Services.AddSignalR();
 
         builder.Services.AddScoped<IVisitCommunicationService, VisitCommunicationService>();
+        builder.Services.AddSingleton<IVisitorUpdateNotifier, VisitorUpdateNotifier>();
 
         return builder;
     }

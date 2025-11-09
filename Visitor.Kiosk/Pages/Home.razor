@@ -1,19 +1,78 @@
 ﻿@page "/"
 @using Visitor.Kiosk.Common.Interfaces
+@using Visitor.Kiosk.Common.Icons
+@using System.ComponentModel.DataAnnotations
 
+<PageTitle>Welcome</PageTitle>
 
-<PageTitle>Home</PageTitle>
+<div class="welcome-container">
+    <div class="welcome-header">
+        <h1>Welcome!</h1>
+        <p class="welcome-text">Thank you for visiting us today. Please use the button below to check in.</p>
+    </div>
 
-<h1>Hello, world!</h1>
+    @if (!showForm)
+    {
+        <div class="checkin-button-container">
+            <button class="btn-checkin" @onclick="ShowCheckInForm">
+                <UserCheck Width="32" Height="32" />
+                <span>Self Check-In</span>
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="checkin-form-container">
+            <h2>Check-In Form</h2>
+            
+            <EditForm Model="@checkInModel" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                
+                <div class="form-group">
+                    <label for="name">Name *</label>
+                    <input type="text" id="name" class="form-control" @bind="checkInModel.Name" placeholder="Enter your name" />
+                    <ValidationMessage For="@(() => checkInModel.Name)" />
+                </div>
 
-Welcome to your new app.
+                <div class="form-group">
+                    <label for="company">Company (optional)</label>
+                    <input type="text" id="company" class="form-control" @bind="checkInModel.Company" placeholder="Enter your company name" />
+                </div>
 
-Message: @(message == "" ? "No Message" : message)
+                <div class="form-buttons">
+                    <button type="button" class="btn-cancel" @onclick="CancelCheckIn">Cancel</button>
+                    <button type="submit" class="btn-submit">Submit</button>
+                </div>
+            </EditForm>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="error-message">@errorMessage</div>
+            }
+
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div class="success-message">@successMessage</div>
+            }
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="signalr-message">
+            <p>Message from server: @message</p>
+        </div>
+    }
+</div>
 
 @code {
     @inject IVisitCommunicationClientService service;
 
     string message = "";
+    bool showForm = false;
+    string? errorMessage = null;
+    string? successMessage = null;
+    CheckInModel checkInModel = new CheckInModel();
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,8 +85,54 @@ Message: @(message == "" ? "No Message" : message)
         await service.CreateHub();
     }
 
+    void ShowCheckInForm()
+    {
+        showForm = true;
+        errorMessage = null;
+        successMessage = null;
+    }
+
+    void CancelCheckIn()
+    {
+        showForm = false;
+        checkInModel = new CheckInModel();
+        errorMessage = null;
+        successMessage = null;
+    }
+
+    async Task HandleSubmit()
+    {
+        try
+        {
+            errorMessage = null;
+            successMessage = null;
+
+            await service.SendVisitorCheckIn(checkInModel.Name, checkInModel.Company ?? "");
+            
+            successMessage = "Check-in successful! Thank you.";
+            
+            // Reset form after short delay
+            await Task.Delay(2000);
+            CancelCheckIn();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+    }
+
     public async ValueTask DisposeAsync()
     {
         await service.DisposeAsync();
+    }
+
+    public class CheckInModel
+    {
+        [Required(ErrorMessage = "Name is required")]
+        [MaxLength(100, ErrorMessage = "Name must not exceed 100 characters")]
+        public string Name { get; set; } = string.Empty;
+
+        [MaxLength(100, ErrorMessage = "Company must not exceed 100 characters")]
+        public string? Company { get; set; }
     }
 }
