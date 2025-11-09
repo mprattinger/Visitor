@@ -1,4 +1,4 @@
-﻿using FlintSoft.CQRS.Interfaces;
+﻿using FlintSoft.CQRS.Handlers;
 using Microsoft.AspNetCore.SignalR;
 using Visitor.Web.Common.Domains;
 using Visitor.Web.Common.Interfaces;
@@ -27,7 +27,7 @@ public class VisitHub(ICommandHandler<Features.CheckInVisitor.CheckInVisitor.Com
             if (result.IsError)
             {
                 var firstError = result.Errors.FirstOrDefault();
-                var errorMessage = firstError?.Description ?? "Validation failed";
+                var errorMessage = firstError.Description ?? "Validation failed";
                 logger.LogWarning("Visitor check-in validation failed: {Error}", errorMessage);
                 throw new ArgumentException(errorMessage);
             }
