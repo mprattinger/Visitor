@@ -1,0 +1,28 @@
+﻿<h1>@welcomeTexts[currentIndex]</h1>
+
+@code {
+    private string[] welcomeTexts = new[]
+   {
+        "Willkommen!",
+        "Welcome!",
+        "Bienvenue!",
+        "Üdvözöljük!"
+    };
+    private int currentIndex = 0;
+    string text = "";
+    private Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        timer = new Timer(_ =>
+        {
+            currentIndex = (currentIndex + 1) % welcomeTexts.Length;
+            InvokeAsync(StateHasChanged);
+        }, null, 0, 5000); // Chan
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}

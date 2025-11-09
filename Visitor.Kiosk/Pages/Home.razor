@@ -7,7 +7,14 @@
 
 <div class="welcome-container">
     <div class="welcome-header">
-        <h1>Welcome!</h1>
+        <Visitor.Kiosk.Components.Welcome />
+        @* <div class="welcome">
+            <div class="header-de">Willkommen!</div>
+            <div class="header-en">Welcome!</div>
+            <div class="header-fr">Bienvenue!</div>
+            <div class="header-hu">Üdvözöljük!</div>
+        </div> *@
+        
         <p class="welcome-text">Thank you for visiting us today. Please use the button below to check in.</p>
     </div>
 
@@ -78,7 +85,14 @@
     {
         service.OnMessageReceived += (msg) =>
         {
-            message = msg;
+            showForm = true;
+            errorMessage = null;
+            successMessage = null;
+            checkInModel = new()
+            {
+                Name = "Michael",
+                Company = "FlintSoft"
+            };
             StateHasChanged();
         };
 

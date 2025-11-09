@@ -10,13 +10,9 @@
 
 .welcome-header {
     margin-bottom: 3rem;
-}
-
-.welcome-header h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    
 }
 
 .welcome-text {
@@ -46,14 +42,14 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.btn-checkin:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
+    .btn-checkin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
 
-.btn-checkin:active {
-    transform: translateY(0);
-}
+    .btn-checkin:active {
+        transform: translateY(0);
+    }
 
 .checkin-form-container {
     background: white;
@@ -64,25 +60,25 @@
     width: 100%;
 }
 
-.checkin-form-container h2 {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 1.5rem;
-    text-align: center;
-}
+    .checkin-form-container h2 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
 
 .form-group {
     margin-bottom: 1.5rem;
     text-align: left;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #333;
-}
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+    }
 
 .form-control {
     width: 100%;
@@ -94,10 +90,10 @@
     box-sizing: border-box;
 }
 
-.form-control:focus {
-    outline: none;
-    border-color: #667eea;
-}
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+    }
 
 .form-buttons {
     display: flex;
@@ -122,18 +118,18 @@
     color: #333;
 }
 
-.btn-cancel:hover {
-    background-color: #d0d0d0;
-}
+    .btn-cancel:hover {
+        background-color: #d0d0d0;
+    }
 
 .btn-submit {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
 }
 
-.btn-submit:hover {
-    opacity: 0.9;
-}
+    .btn-submit:hover {
+        opacity: 0.9;
+    }
 
 .error-message {
     margin-top: 1rem;
