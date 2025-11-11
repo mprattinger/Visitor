@@ -1,0 +1,73 @@
+﻿@using Visitor.Kiosk.Common.Interfaces
+@using Visitor.Kiosk.Models
+
+@if (Model is not null)
+{
+    <EditForm EditContext="editContext" OnValidSubmit="Submit" FormName="register-visitor">
+        <AntiforgeryToken />
+        <DataAnnotationsValidator />
+
+        <div>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" class="form-control" @bind-value="Model.Name" />
+                <ValidationMessage For="@(() => Model.Name)" />
+            </div>
+
+            <div class="form-group">
+                <label for="company">Firma</label>
+                <input type="text" id="company" class="form-control" @bind-value="Model.Company" />
+                <ValidationMessage For="@(() => Model.Company)" />
+            </div>
+
+            <div class="modal-footer">
+                <SecondaryButton ButtonType="button" OnClick="handleClose">Abbrechen</SecondaryButton>
+                <PrimaryButton ButtonType="submit">Besuch planen</PrimaryButton>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    @inject IVisitCommunicationClientService service;
+
+    public Action? HideForm { get; set; }
+
+    [SupplyParameterFromForm]
+    private CheckInModel? Model { get; set; }
+
+    private EditContext? editContext;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ResetForm();
+        await service.CreateHub();
+    }
+
+    private void ResetForm()
+    {
+        Model = new CheckInModel();
+        editContext = new EditContext(Model);
+    }
+
+    private async Task Submit()
+    {
+        HideForm?.Invoke();
+    }
+
+    void handleClose()
+    {
+        Console.WriteLine("Handle Close");
+        ResetForm();   
+        if(HideForm is null)
+        {
+            Console.WriteLine("HideForm is null");
+        }
+        HideForm?.Invoke();
+    }
+
+    public void SelfService()
+    {
+        ResetForm();
+    }
+}

@@ -1,5 +1,4 @@
-﻿@using Visitor.Web.Common.Buttons
-@using Visitor.Web.Common.Interfaces
+﻿@using Visitor.Web.Common.Interfaces
 @using Visitor.Web.Features.PlanVisit
 
 <div class="header">
@@ -30,7 +29,7 @@
 
     private async Task openSelfService()
     {
-        await communicationService.Broadcast("self-service");
+        await communicationService.Broadcast("activateSelfService");
     }
 
     private async Task OnVisitPlanned()

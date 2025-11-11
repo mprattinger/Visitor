@@ -1,0 +1,14 @@
+﻿@using System.Reflection
+@using Visitor.Kiosk.Common
+<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)" AdditionalAssemblies="@getAssemblies">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+    </Found>
+</Router>
+
+@code {
+    private List<Assembly> getAssemblies => new()
+    {
+        typeof(Visitor.Kiosk.Extensions).Assembly
+    };
+}

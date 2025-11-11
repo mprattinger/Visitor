@@ -13,4 +13,8 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Visitor.Shared\Visitor.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
