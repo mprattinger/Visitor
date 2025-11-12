@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Sdk Name="Aspire.AppHost.Sdk" Version="9.4.1" />
+  <Sdk Name="Aspire.AppHost.Sdk" Version="13.0.0" />
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Visitor.Kiosk\Visitor.Kiosk.csproj" />
+    <ProjectReference Include="..\..\Kiosk\Visitor.Kiosk.Web\Visitor.Kiosk.Web.csproj" />
     <ProjectReference Include="..\..\Visitor.Web\Visitor.Web.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿@using Visitor.Web.Common.Buttons
+﻿@using Visitor.Shared.DTOs
 @using Visitor.Web.Common.Interfaces
 @using Visitor.Web.Features.PlanVisit
 
@@ -30,7 +30,12 @@
 
     private async Task openSelfService()
     {
-        await communicationService.Broadcast("self-service");
+        var dto = new CommunicationDTO();
+        dto.Mode = "SELF_CHECK_IN";
+
+        var payload = System.Text.Json.JsonSerializer.Serialize(dto);
+
+        await communicationService.Broadcast(payload);
     }
 
     private async Task OnVisitPlanned()

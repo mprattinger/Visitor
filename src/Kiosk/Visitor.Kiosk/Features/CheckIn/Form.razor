@@ -1,0 +1,79 @@
+﻿@if (show)
+{
+    <div class="container">
+        <h2>Check-In Form</h2>
+        @if (checkInModel is not null)
+        {
+            <EditForm EditContext="editContext" OnValidSubmit="Submit" FormName="checkin-form">
+                <DataAnnotationsValidator />
+
+                <input @bind="checkInModel.Id" type="hidden"/>
+
+                <div class="form-group">
+                    <label for="name">Name *</label>
+                    <input type="text" id="name" class="form-control" @bind="checkInModel.Name" placeholder="Enter your name" />
+                    <ValidationMessage For="@(() => checkInModel.Name)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Firma</label>
+                    <input type="text" id="name" class="form-control" @bind="checkInModel.Company" placeholder="Enter your name" />
+                    <ValidationMessage For="@(() => checkInModel.Company)" />
+                </div>
+
+                <div class="form-buttons">
+                    <PrimaryButton ButtonType="submit">Submit</PrimaryButton>
+                    <GreenButton ButtonType="button" OnClick="CancelCheckIn">Cancel</GreenButton>
+                </div>
+            </EditForm>
+        }
+    </div>
+}
+
+@code {
+    bool show = false;
+    private EditContext? editContext;
+    CheckInModel? checkInModel;
+    CheckinMode checkInMode = CheckinMode.UNKNOWN;
+
+    [Parameter, EditorRequired]
+    public EventCallback<(CheckinResult result, CheckinMode mode, CheckInModel? model)> Callback { get; set; }
+
+    public void SelfCheckin()
+    {
+        show = true;
+        checkInMode = CheckinMode.SELF;
+        checkInModel = new CheckInModel();
+        checkInModel.Id = Guid.CreateVersion7();
+        editContext = new EditContext(checkInModel);
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void RemoteCheckin(Guid id, string name, string? company)
+    {
+        show = true;
+        checkInMode = CheckinMode.REMOTE;
+        checkInModel = new CheckInModel();
+        checkInModel.Id = id;
+        checkInModel.Name = name;
+        checkInModel.Company = company;
+        editContext = new EditContext(checkInModel);
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task Submit()
+    {
+        show = false;
+        await Callback.InvokeAsync((CheckinResult.VALID, checkInMode, checkInModel));
+        checkInModel = null;
+        checkInMode = CheckinMode.UNKNOWN;
+    }
+
+    void CancelCheckIn()
+    {
+        show = false;
+        checkInModel = null;
+        Callback.InvokeAsync((CheckinResult.CANCELLED, checkInMode, null));
+        checkInMode = CheckinMode.UNKNOWN;
+    }
+}

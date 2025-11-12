@@ -1,0 +1,70 @@
+﻿@using Visitor.Kiosk.Common.Interfaces
+@using Visitor.Kiosk.Features.CheckIn
+@using Visitor.Kiosk.Features.Welcome
+@using Visitor.Shared.DTOs
+
+<div class="container">
+    <Form @ref="formRef" Callback="HandleFormCallback" />
+    @if(!showForm)
+    {
+        <div>
+            <WelcomeComponent OnSelfCheckIn="HandleSelfCheckIn" />
+        </div>
+    }
+</div>
+
+@code {
+    @inject IVisitCommunicationClientService CommunicationService
+
+    bool showForm = false;
+    Form? formRef;
+
+    protected override async Task OnInitializedAsync()
+    {
+        CommunicationService.OnMessageReceived += (msg) =>
+        {
+            if (msg.Mode == "SELF_CHECK_IN")
+            {
+                HandleSelfCheckIn();
+            }
+
+            if (msg.Mode == "REMOTE_CHECK_IN")
+            {
+                HandleRemoteCheckIn(msg);
+            }
+
+            InvokeAsync(StateHasChanged);
+        };
+
+        await CommunicationService.CreateHub();
+    }
+
+    void HandleSelfCheckIn()
+    {
+        if (formRef is not null)
+        {
+            formRef.SelfCheckin();
+            showForm = true;
+        }
+    }
+
+    void HandleRemoteCheckIn(CommunicationDTO dto)
+    {
+        if (formRef is not null)
+        {
+            formRef.RemoteCheckin(dto.Id, dto.Name, dto.Company);
+            showForm = true;
+        }
+    }
+
+    async Task HandleFormCallback((CheckinResult result, CheckinMode mode, CheckInModel? model) args)
+    {
+        showForm = false;
+        if (args.result == CheckinResult.UNKNOWN || args.result == CheckinResult.CANCELLED || args.model is null)
+        {
+            return;
+        }
+
+        await CommunicationService.SendVisitorCheckIn(args.model.Id, args.model.Name, args.model.Company ?? "", args.mode);
+    }
+}

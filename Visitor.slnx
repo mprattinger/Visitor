@@ -1,7 +1,11 @@
 <Solution>
+  <Folder Name="/Kiosk/">
+    <Project Path="src/Kiosk/Visitor.Kiosk.Client/Visitor.Kiosk.Client.csproj" />
+    <Project Path="src/Kiosk/Visitor.Kiosk.Web/Visitor.Kiosk.Web.csproj" />
+    <Project Path="src/Kiosk/Visitor.Kiosk/Visitor.Kiosk.csproj" Id="396a849d-ee27-4543-954a-921b5455fe3a" />
+  </Folder>
   <Project Path="src/aspire/Visitor.AppHost/Visitor.AppHost.csproj" Id="6b1ee5cd-7426-4bda-b205-0bb061a3168e" />
   <Project Path="src/aspire/Visitor.ServiceDefaults/Visitor.ServiceDefaults.csproj" />
   <Project Path="src/Visitor.Web/Visitor.Web.csproj" Id="bf6357f4-9e1c-4706-94a2-33d0f3083a23" />
   <Project Path="src/Visitor.Shared/Visitor.Shared.csproj" />
-  <Project Path="Visitor.Kiosk/Visitor.Kiosk.csproj" />
 </Solution>

@@ -2,34 +2,32 @@
 @using Visitor.Kiosk.Common.Interfaces
 @using Visitor.Kiosk.Common.Icons
 @using System.ComponentModel.DataAnnotations
+@using Visitor.Kiosk.Components
+@using Visitor.Kiosk.Models
 
 <PageTitle>Welcome</PageTitle>
 
-<div class="welcome-container">
-    <div class="welcome-header">
-        <Visitor.Kiosk.Components.Welcome />
-        @* <div class="welcome">
-            <div class="header-de">Willkommen!</div>
-            <div class="header-en">Welcome!</div>
-            <div class="header-fr">Bienvenue!</div>
-            <div class="header-hu">Üdvözöljük!</div>
-        </div> *@
-        
-        <p class="welcome-text">Thank you for visiting us today. Please use the button below to check in.</p>
-    </div>
 
-    @if (!showForm)
-    {
+
+@if (!showForm)
+{
+    <div class="welcome-container">
+        <div class="welcome-header">
+            <Visitor.Kiosk.Components.Welcome />
+            <p class="welcome-text">Thank you for visiting us today. Please use the button below to check in.</p>
+        </div>
         <div class="checkin-button-container">
             <button class="btn-checkin" @onclick="ShowCheckInForm">
                 <UserCheck Width="32" Height="32" />
                 <span>Self Check-In</span>
             </button>
         </div>
-    }
-    else
-    {
-        <div class="checkin-form-container">
+    </div>
+}
+else
+{
+    <RegisterForm @ref="formRef" />
+    @*         <div class="checkin-form-container">
             <h2>Check-In Form</h2>
             
             <EditForm Model="@checkInModel" OnValidSubmit="HandleSubmit">
@@ -61,38 +59,32 @@
             {
                 <div class="success-message">@successMessage</div>
             }
-        </div>
-    }
+        </div> *@
+}
 
-    @if (!string.IsNullOrEmpty(message))
-    {
-        <div class="signalr-message">
-            <p>Message from server: @message</p>
-        </div>
-    }
-</div>
 
 @code {
     @inject IVisitCommunicationClientService service;
 
-    string message = "";
     bool showForm = false;
-    string? errorMessage = null;
-    string? successMessage = null;
-    CheckInModel checkInModel = new CheckInModel();
+    RegisterForm? formRef;
+
+    // string? errorMessage = null;
+    // string? successMessage = null;
+    // CheckInModel checkInModel = new CheckInModel();
 
     protected override async Task OnInitializedAsync()
     {
         service.OnMessageReceived += (msg) =>
         {
-            showForm = true;
-            errorMessage = null;
-            successMessage = null;
-            checkInModel = new()
-            {
-                Name = "Michael",
-                Company = "FlintSoft"
-            };
+            // showForm = true;
+            // errorMessage = null;
+            // successMessage = null;
+            // checkInModel = new()
+            // {
+            //     Name = "Michael",
+            //     Company = "FlintSoft"
+            // };
             StateHasChanged();
         };
 
@@ -101,52 +93,45 @@
 
     void ShowCheckInForm()
     {
+        formRef?.HideForm += HideForm;
+        formRef?.SelfService();
         showForm = true;
-        errorMessage = null;
-        successMessage = null;
     }
 
-    void CancelCheckIn()
+    void HideForm()
     {
+        Console.WriteLine("hideForm gets invoked");
         showForm = false;
-        checkInModel = new CheckInModel();
-        errorMessage = null;
-        successMessage = null;
+        StateHasChanged();
+        // checkInModel = new CheckInModel();
+        // errorMessage = null;
+        // successMessage = null;
     }
 
     async Task HandleSubmit()
     {
-        try
-        {
-            errorMessage = null;
-            successMessage = null;
+        // try
+        // {
+        // errorMessage = null;
+        // successMessage = null;
 
-            await service.SendVisitorCheckIn(checkInModel.Name, checkInModel.Company ?? "");
-            
-            successMessage = "Check-in successful! Thank you.";
-            
-            // Reset form after short delay
-            await Task.Delay(2000);
-            CancelCheckIn();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"An error occurred: {ex.Message}";
-        }
+        // await service.SendVisitorCheckIn(checkInModel.Name, checkInModel.Company ?? "");
+
+        // successMessage = "Check-in successful! Thank you.";
+
+        // // Reset form after short delay
+        // await Task.Delay(2000);
+        // CancelCheckIn();
+        // }
+        // catch (Exception ex)
+        // {
+        //     errorMessage = $"An error occurred: {ex.Message}";
+        // }
     }
 
     public async ValueTask DisposeAsync()
     {
         await service.DisposeAsync();
-    }
-
-    public class CheckInModel
-    {
-        [Required(ErrorMessage = "Name is required")]
-        [MaxLength(100, ErrorMessage = "Name must not exceed 100 characters")]
-        public string Name { get; set; } = string.Empty;
-
-        [MaxLength(100, ErrorMessage = "Company must not exceed 100 characters")]
-        public string? Company { get; set; }
+        formRef?.HideForm -= HideForm;
     }
 }
