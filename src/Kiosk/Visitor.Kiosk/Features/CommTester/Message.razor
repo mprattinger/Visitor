@@ -1,0 +1,27 @@
+﻿@using Visitor.Kiosk.Common.Interfaces
+
+<h3>Message</h3>
+
+<p>@message</p>
+
+@code {
+    @inject IVisitCommunicationClientService service;
+
+    string message = "No message received yet.";
+
+    protected override async Task OnInitializedAsync()
+    {
+        service.OnMessageReceived += (msg) =>
+        {
+            message = msg.Mode;
+            InvokeAsync(StateHasChanged);
+        };
+
+        await service.CreateHub();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await service.DisposeAsync();
+    }
+}

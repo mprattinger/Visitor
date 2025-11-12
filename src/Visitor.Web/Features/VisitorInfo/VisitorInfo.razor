@@ -1,4 +1,6 @@
-﻿@using Visitor.Web.Common.Domains
+﻿@using Visitor.Shared.DTOs
+@using Visitor.Web.Common.Domains
+@using Visitor.Web.Common.Interfaces
 @using Visitor.Web.Features.VisitsForDate
 
 @if (VisitorSummary is not null)
@@ -22,8 +24,9 @@
 }
 
 @code {
-    @inject ICommandHandler<MarkVisitorArrived.Command, VisitorEntity> markVisitorArrivedCommandHandler;
+    
     @inject ICommandHandler<VisitorLeaves.Command, VisitorEntity> visitorLeavesCommandHandler;
+    @inject IVisitCommunicationService communicationService;
 
     [CascadingParameter]
     public ApplicationContext? Context { get; set; }
@@ -36,19 +39,36 @@
 
     private async Task HandleVisitorArrival(Guid visitorId)
     {
-        var result = await markVisitorArrivedCommandHandler.Handle(new MarkVisitorArrived.Command(visitorId), CancellationToken.None);
-
-        if (result.IsError)
+        if(VisitorSummary is null)
         {
-            var firstError = result.Errors.FirstOrDefault();
-            Context?.AddError(firstError.Description ?? "An error occurred while marking visitor as arrived.");
             return;
-        }
+        };
 
-        if (OnChange.HasDelegate)
-        {
-            await OnChange.InvokeAsync();
-        }
+        var dto = new CommunicationDTO
+            {
+                Id = VisitorSummary.Id,
+                Name = VisitorSummary.Name,
+                Company = VisitorSummary.Company,
+                Mode = "REMOTE_CHECK_IN"
+            };
+
+        var payload = System.Text.Json.JsonSerializer.Serialize(dto);
+
+        await communicationService.Broadcast(payload);
+
+        // var result = await markVisitorArrivedCommandHandler.Handle(new MarkVisitorArrived.Command(visitorId), CancellationToken.None);
+
+        // if (result.IsError)
+        // {
+        //     var firstError = result.Errors.FirstOrDefault();
+        //     Context?.AddError(firstError.Description ?? "An error occurred while marking visitor as arrived.");
+        //     return;
+        // }
+
+        // if (OnChange.HasDelegate)
+        // {
+        //     await OnChange.InvokeAsync();
+        // }
     }
 
     async Task HandleVisitorLeave(Guid visitorId)

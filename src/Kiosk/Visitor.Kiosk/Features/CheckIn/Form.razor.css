@@ -1,0 +1,53 @@
+﻿.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 8rem;
+}
+
+    .container h2 {
+        font-size: 4rem;
+        color: #333;
+        text-align: center;
+    }
+
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+    width: 20rem;
+}
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+.form-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: end;
+}
+
+.form-buttons ::deep button {
+    height: 3rem;
+    width: 8rem;
+}

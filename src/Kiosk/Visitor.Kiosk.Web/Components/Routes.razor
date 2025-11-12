@@ -1,9 +1,21 @@
 ﻿@using System.Reflection
 @using Visitor.Kiosk.Common
-<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)" AdditionalAssemblies="@getAssemblies">
+@using Visitor.Kiosk.Web.Components.Pages
+
+<Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="@getAssemblies">
+    @* <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)" />
+    </Found> *@
+
     <Found Context="routeData">
         <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
     </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="typeof(MainLayout)">
+            <NotFound />
+        </LayoutView>
+    </NotFound>
 </Router>
 
 @code {

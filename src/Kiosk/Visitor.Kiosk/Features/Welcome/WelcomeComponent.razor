@@ -1,0 +1,55 @@
+﻿<div class="container">
+    <h1>@welcomeTexts[currentIndex]</h1>
+    @* <p class="welcome-text">Thank you for visiting us today. Please use the button below to check in.</p> *@
+    <p class="welcome-text">@welcomeTextsLong[currentIndex]</p>
+    <div class="welcome-button">
+        <button @onclick="handleSelfCheckIn">
+            <UserCheck />
+            <span>Self Check-In</span>
+        </button>
+    </div>
+</div>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public EventCallback OnSelfCheckIn { get; set; }
+
+    private string[] welcomeTexts = new[]
+    {
+        "Willkommen!",
+        "Welcome!",
+        "Bienvenue!",
+        "Üdvözöljük!"
+    };
+
+    private string[] welcomeTextsLong = new[]
+    {
+        "Danke für Ihren heutigen Besuch. Bitte melden Sie sich an der Rezeption oder melden Sie mit dem unteren Button selbst an.",
+        "Thank you for visiting us today. Please contact the desk or use the button below to check in.",
+        "Merci de votre visite aujourd'hui. Veuillez vous adresser à l'accueil ou utiliser le bouton ci-dessous pour vous enregistrer.",
+        "Köszönjük, hogy ma meglátogatott minket. Kérjük, forduljon a recepcióhoz, vagy használja az alábbi gombot a bejelentkezéshez."
+    };
+
+    private int currentIndex = 0;
+    private Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        timer = new Timer(_ =>
+        {
+            currentIndex = (currentIndex + 1) % welcomeTexts.Length;
+            InvokeAsync(StateHasChanged);
+        }, null, 0, 10000); // Chan
+    }
+
+    void handleSelfCheckIn()
+    {
+        OnSelfCheckIn.InvokeAsync();
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}
