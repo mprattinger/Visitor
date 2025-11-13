@@ -93,8 +93,8 @@ jobs:
       - name: Build and push Docker image
         if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v5
-        builder: ${{ github.run_id }}
-        no-cache: true
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
         with:
           context: .
           file: ./src/Visitor.Web/Dockerfile
@@ -107,8 +107,8 @@ jobs:
       - name: Build and push Docker image
         if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v5
-        builder: ${{ github.run_id }}
-        no-cache: true
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
         with:
           context: .
           file: ./src/Kiosk/Visitor.Kiosk.Web/Dockerfile
