@@ -93,8 +93,6 @@ jobs:
       - name: Build and push Docker image
         if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v5
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
         with:
           context: .
           file: ./src/Visitor.Web/Dockerfile
@@ -103,6 +101,8 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.gitversion.outputs.semVer }}
           build-args: BUILD_VERSION=${{ steps.gitversion.outputs.semVer }}
+          builder: ${{ github.run_id }}
+          no-cache: true
           
       - name: Build and push Docker image
         if: github.ref == 'refs/heads/main'
@@ -117,6 +117,8 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME_KIOSK }}:latest
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME_KIOSK }}:${{ steps.gitversion.outputs.semVer }}
           build-args: BUILD_VERSION=${{ steps.gitversion.outputs.semVer }}
+          builder: ${{ github.run_id }}
+          no-cache: true
 
       # - name: Build Docker image (non-main branches)
       #   if: github.ref != 'refs/heads/main'
