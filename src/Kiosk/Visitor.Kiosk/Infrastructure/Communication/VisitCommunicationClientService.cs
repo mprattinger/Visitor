@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using Visitor.Kiosk.Common.Interfaces;
 using Visitor.Kiosk.Features.CheckIn;
@@ -7,7 +8,7 @@ using Visitor.Shared.DTOs;
 
 namespace Visitor.Kiosk.Infrastructure.Communication;
 
-public class VisitCommunicationClientService(NavigationManager navigationManager) : IVisitCommunicationClientService
+public class VisitCommunicationClientService(NavigationManager navigationManager, IConfiguration configuration) : IVisitCommunicationClientService
 {
     private HubConnection? _hubConnection;
 
@@ -18,7 +19,7 @@ public class VisitCommunicationClientService(NavigationManager navigationManager
         if (_hubConnection != null)
             return;
 
-        var serverUrl = "https://localhost:7002";
+        var serverUrl = configuration["SignalRHub"] ?? "https://localhost:7002";
         serverUrl = serverUrl.TrimEnd('/') + "/visithub";
         Console.WriteLine(serverUrl);
 
