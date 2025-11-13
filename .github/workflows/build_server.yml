@@ -12,6 +12,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: visitor
+  IMAGE_NAME_KIOSK: visitorkiosk
 
 jobs:
   tests:
@@ -109,8 +110,8 @@ jobs:
           file: ./src/Kiosk/Visitor.Kiosk.Web/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.gitversion.outputs.semVer }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME_KIOSK }}:latest
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME_KIOSK }}:${{ steps.gitversion.outputs.semVer }}
           build-args: BUILD_VERSION=${{ steps.gitversion.outputs.semVer }}
 
       # - name: Build Docker image (non-main branches)
