@@ -35,7 +35,7 @@ jobs:
       - name: Test
         run: dotnet test --configuration Release --no-restore
 
-  build:
+  build-server:
     runs-on: ubuntu-latest
     needs: tests
     permissions:
@@ -101,8 +101,60 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.gitversion.outputs.semVer }}
           build-args: BUILD_VERSION=${{ steps.gitversion.outputs.semVer }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+          
+      # - name: Build Docker image (non-main branches)
+      #   if: github.ref != 'refs/heads/main'
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     file: ./src/Visitor.Web/Dockerfile
+      #     push: false
+      #     tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
+      
+  build-client:
+    runs-on: ubuntu-latest
+    needs: tests
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v1
+        with:
+          versionSpec: "5.x"
+      
+      - name: Run GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v1
+        with:
+          useConfigFile: true
+          configFilePath: GitVersion.yml
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Log in to GitHub Container Registry
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Build and push Docker image
         if: github.ref == 'refs/heads/main'
@@ -115,14 +167,3 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME_KIOSK }}:latest
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME_KIOSK }}:${{ steps.gitversion.outputs.semVer }}
           build-args: BUILD_VERSION=${{ steps.gitversion.outputs.semVer }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
-
-      # - name: Build Docker image (non-main branches)
-      #   if: github.ref != 'refs/heads/main'
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: .
-      #     file: ./src/Visitor.Web/Dockerfile
-      #     push: false
-      #     tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
